@@ -12,15 +12,12 @@ public class Configuration {
 
     private static Boolean configFileOnClassPath = false;
     public static Config getConfiguration(){
-        Config config = ConfigFactory.load();
-        configFileOnClassPath = false;
-        try{
+        Config config = ConfigFactory.load();//this will load from the classpath
 
-            configFileOnClassPath = "true".equals(config.getString("simplex"));
-
-        } catch (Exception e){ //we didn't find any application.conf files on the classpath (example, standalone jar)
-
-            File configFile = new File("/Applications/steptimerwebsocket/application.conf");
+        //This overrides classpath config file
+        String configFilePath=System.getProperty("config");//ex: /home/workspae/stedi-application/application.conf
+        if (configFilePath!=null && configFilePath!=""){
+            File configFile=new File(configFilePath);
             config = ConfigFactory.parseFile(configFile);
         }
         return config;

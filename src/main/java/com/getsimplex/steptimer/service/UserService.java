@@ -15,7 +15,7 @@ public class UserService {
 
     public static User getUser(String userName) throws Exception{
         Predicate<User> userPredicate = user -> user.getUserName().equals(userName);
-        List<User> users =getUsers(userName);
+        List<User> users =getUsers();
         Optional<User> userOptional = users.stream().filter(userPredicate).findFirst();
         if (!userOptional.isPresent()){
             throw new Exception ("User name not found");
@@ -25,7 +25,7 @@ public class UserService {
 
     }
 
-    public static List<User> getUsers(String userName){
+    public static List<User> getUsers() throws Exception{
         ArrayList<User> users = JedisData.getEntityList(User.class);
         return users;
     }

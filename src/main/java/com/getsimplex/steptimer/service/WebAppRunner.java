@@ -5,7 +5,7 @@ package com.getsimplex.steptimer.service;
  */
 
 
-import com.getsimplex.steptimer.model.User;
+import com.getsimplex.steptimer.model.*;
 import com.getsimplex.steptimer.utils.*;
 import spark.Request;
 import spark.Response;
@@ -19,26 +19,44 @@ public class WebAppRunner {
 
     public static void main(String[] args){
 
+        MessageIntake.route(new StartReceivingKafkaMessages());//connect to customer-risk topic
+
         Spark.port(getHerokuAssignedPort());
+
+        createTestUser();
+
+        createTestCustomer();
+
+        if ("true".equals(System.getProperty("simulation"))){
+            startSimulationData();
+        }
+
+
 		//secure("/Applications/steptimerwebsocket/keystore.jks","password","/Applications/steptimerwebsocket/keystore.jks","password");
         staticFileLocation("/public");
-        //webSocket("/socket", WebSocketHandler.class);
+        webSocket("/socket", DeviceWebSocketHandler.class);
+        webSocket("/timeruiwebsocket", TimerUIWebSocket.class);
         //post("/sensorUpdates", (req, res)-> WebServiceHandler.routeDeviceRequest(req));
         //post("/generateHistoricalGraph", (req, res)->routePdfRequest(req, res));
         //get("/readPdf", (req, res)->routePdfRequest(req, res));
         post("/user", (req, res)-> callUserDatabase(req));
+
+        get("/simulation", (req, res) -> SimulationDataDriver.getSimulationActive());
+        post("/simulation", (req, res)-> MessageIntake.route(new StartSimulation(30)));
+        delete("/simulation", (req, res)-> MessageIntake.route(new StopSimulation()));
+
         get ("/stephistory/:customer", (req, res)-> {
-            try{
-                userFilter(req, res);
-            } catch (Exception e){
-                return "/";
-            }
+//            try{
+//                userFilter(req, res);
+//            } catch (Exception e){
+//                res.redirect("/");
+//            }
             return StepHistory.getAllTests(req.params(":customer"));
         });
         post("/customer", (req, res)-> {
             String newLocation;
             try {
-                userFilter(req, res);
+//                userFilter(req, res);
                 createNewCustomer(req, res);
                 newLocation="/timer.html";
             } catch (Exception e){
@@ -49,21 +67,22 @@ public class WebAppRunner {
         });
         get("/customer/:customer", (req, res)-> {
             try {
-                userFilter(req, res);
-                return FindCustomer.handleRequest(req);
+//                userFilter(req, res);
             } catch (Exception e){
+                res.status(401);
                 System.out.println("*** Error Finding Customer: "+e.getMessage());
                 return null;
             }
+            return FindCustomer.handleRequest(req);
 
         });
 
         post("/login", (req, res)->loginUser(req));
         post("/rapidsteptest", (req, res)->{
             try{
-                userFilter(req, res);
+//                userFilter(req, res);
             } catch (Exception e){
-                return "/";
+                res.status(401);
             }
 
             saveStepSession(req);
@@ -71,10 +90,11 @@ public class WebAppRunner {
         });
         get("/riskscore/:customer",((req,res) -> {
             try{
-                userFilter(req, res);
+//                          userFilter(req, res);
             } catch (Exception e){
+                res.status(401);
                 System.out.println("*** Error Finding Risk Score: "+e.getMessage());
-                return null;
+                throw e;
             }
             return riskScore(req.params(":customer"));
         }));
@@ -90,8 +110,17 @@ public class WebAppRunner {
 
             Boolean tokenExpired = SessionValidator.validateToken(tokenString);
 
-            if (!user.isPresent() || tokenExpired.equals(true)) { //Check to see if session expired
-                throw new Exception("Invalid user token");
+            if (user.isPresent() && tokenExpired && !user.get().isLocked()){//if a user is locked, we won't renew tokens until they are unlocked
+                TokenService.renewToken(tokenString);
+                return;
+            }
+
+            if (!user.isPresent()) { //Check to see if session expired
+                throw new Exception("Invalid user token: user not found using token: "+tokenString);
+            }
+
+            if (tokenExpired.equals(true)){
+                throw new Exception("Invalid user token: "+tokenString+" expired");
             }
 
     }
@@ -146,5 +175,38 @@ public class WebAppRunner {
             return Integer.parseInt(processBuilder.environment().get("PORT"));
         }
         return Configuration.getConfiguration().getInt("suresteps.port"); //return default port if heroku-port isn't set (i.e. on localhost)
+    }
+
+    private static void createTestUser(){//for Udacity course local use only
+
+        try {
+            User user = new User();
+            user.setUserName("clinicmanager");
+            user.setPassword("Cl1n1cM@n@ger");
+            user.setVerifyPassword("Cl1n1cM@n@ger");
+            user.setAccountType("personal");
+            CreateNewUser.createUser(user);
+        } catch (Exception e){
+            System.out.println("Unable to create test user due to exception: "+e.getMessage());
+        }
+    }
+
+    private static void createTestCustomer() {
+        try{
+            Customer customer = new Customer();
+            customer.setCustomerName("Steady Senior");
+            customer.setEmail("steady@stedi.fit");
+            customer.setPhone("8015551212");
+            customer.setBirthDay("1901-01-01");
+            CreateNewCustomer.createCustomer(customer);
+        }
+        catch (Exception e){
+            System.out.println("Unable to create customer due to exception: "+e.getMessage());
+        }
+    }
+
+    private static void startSimulationData(){
+        StartSimulation startSimulation = new StartSimulation(30);
+        MessageIntake.route(startSimulation);
     }
 }

@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.function.Predicate;
+import static com.getsimplex.steptimer.service.TokenService.*;
 
 /**
  * Created by sean on 8/12/2016.
@@ -51,16 +52,7 @@ public class SessionValidator {
     }
 
     public static Boolean validateToken(String tokenString) throws Exception{
-        ArrayList<LoginToken> allTokens = JedisData.getEntityList(LoginToken.class);
-        Predicate<LoginToken> tokenPredicate = token -> token.getUuid().equals(tokenString);
-        Optional<LoginToken> matchingToken=allTokens.stream().filter(tokenPredicate).findFirst();
-
-        Boolean expired = false;
-        if (matchingToken.isPresent() && matchingToken.get().getExpires() && matchingToken.get().getExpiration().before(new Date())){
-            expired = true;
-        }
-
-        return expired;
+        return TokenService.validateToken(tokenString);
     }
 
 

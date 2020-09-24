@@ -9,6 +9,7 @@ import com.getsimplex.steptimer.utils.JedisData;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
@@ -16,8 +17,14 @@ import java.util.stream.Collectors;
  * Created by .
  */
 public class StepHistory {
-
+    private static Logger logger = Logger.getLogger(StepHistory.class.getName());
     private static Gson gson = GsonFactory.getGson();
+    private static boolean solutionActive = false;
+
+    static {
+        solutionActive = Boolean.valueOf(System.getProperty("solutionActive"));//this makes it like the Spark app is sending messages (only for teacher use)
+    }
+
 
     public static String saveSensorTail(Request request) throws Exception{
         String tokenString = request.headers("suresteps.session.token");
@@ -40,7 +47,7 @@ public class StepHistory {
     }
 
 
-    public static String getAllTests(String email) {
+    public static String getAllTests(String email) throws Exception{
         ArrayList<RapidStepTest> allTests = JedisData.getEntityList(RapidStepTest.class);
         Predicate<RapidStepTest> historicUserPredicate = user -> user.getCustomer().getEmail().equals(email);
 
@@ -49,13 +56,19 @@ public class StepHistory {
     }
 
     public static String riskScore(String email) throws Exception{
-        System.out.println("Received score request");
+        logger.info("Received score request for: "+email);
+        Optional<Customer> customer = FindCustomer.findCustomer(email);
+
+        if (!customer.isPresent()){
+            throw new Exception ("Unable to score risk for non-existent customer: "+email);
+        }
+
         ArrayList<RapidStepTest> allTests = JedisData.getEntityList(RapidStepTest.class);
         Predicate<RapidStepTest> historicUserPredicate = stepTest -> stepTest.getCustomer().getEmail().equals(email);
 
         List<RapidStepTest> rapidStepTestsSortedByDate = allTests.stream().filter(historicUserPredicate).sorted(Comparator.comparing(RapidStepTest::getStartTime)).collect(Collectors.toList());
         if (rapidStepTestsSortedByDate.size()<4){
-            throw new Exception("Customer "+email+" has: "+rapidStepTestsSortedByDate.size()+" rapid step tests on file which is less than the required number(2) to calculate fall risk.");
+            throw new Exception("Customer "+email+" has: "+rapidStepTestsSortedByDate.size()+" rapid step tests on file which is less than the required number(4) to calculate fall risk.");
         }
 
         RapidStepTest mostRecentTest = rapidStepTestsSortedByDate.get(rapidStepTestsSortedByDate.size()-1);
@@ -72,8 +85,21 @@ public class StepHistory {
         //positive means they have improved
         //negative means they have declined
 
-        System.out.println("Score: "+riskScore.setScale(2, BigDecimal.ROUND_HALF_UP).toString());
-        return riskScore.setScale(2, BigDecimal.ROUND_HALF_UP).toString();//score of magnitude 10 or larger means significant change in risk
+        Integer birthYear = Integer.valueOf(customer.get().getBirthDay().split("-")[0]);
+
+        CustomerRisk customerRisk = new CustomerRisk();
+        customerRisk.setScore(new Float(riskScore.setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        customerRisk.setCustomer(email);
+        customerRisk.setRiskDate(new Date(mostRecentTest.getStopTime()));
+
+        if (solutionActive) {//we don't want this data to be visible if the student is working on retrieving it from redis
+            customerRisk.setBirthYear(birthYear);
+        }
+
+        logger.info("Risk for customer: "+email+" "+gson.toJson(customerRisk));
+        return gson.toJson(customerRisk);
     }
+
+
 
 }

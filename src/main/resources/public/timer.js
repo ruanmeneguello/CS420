@@ -10,6 +10,7 @@
     var customer = JSON.parse(localStorage.getItem("customer"));
     var startandstopbutton;
     var counterbutton;
+    var timerUIWebSocket = new WebSocket(`ws${location.protocol=='https:'? 's': ''}://${location.hostname}:${location.port}/timeruiwebsocket`)
 
     $(document).ready(function(){
         $('#dob').html(customer.birthDay);
@@ -31,14 +32,71 @@
         }
     };
 
+    var setupUISocket = () => {
+        timerUIWebSocket.onclose = () =>{
+            alert("The workspace or server has shut down this connection. You will be re-directed to the login page.")
+            window.location.href="/";
+        }
+    }
+
+    var fetchToggleState = () => {
+
+        var headers = { "suresteps.session.token": localStorage.getItem("token")};
+        $.ajax({
+            type: 'GET',
+            url: '/simulation',
+            contentType: 'application/text',
+            dataType: 'text',
+            headers: headers,
+            statusCode: {
+                200: (simulationActive) => {
+                    var active = JSON.parse(simulationActive);
+
+                    if (active === true){
+                        $('#enablesimulationcheckbox').prop('checked', true);
+                    } else{
+                        $('#enablesimulationcheckbox').prop('checked', false);
+                    }
+                },
+                401: () => window.location.href="/",
+            },
+        });
+
+    }
+
+    // this function is called when the toggle is activated/de-activated to enable simulated user traffic
+    var simulationUpdate = (object) => {
+        if ($(object).is(":checked")){
+          $.ajax({
+              type: 'POST',
+              url: '/simulation',
+              statusCode:{
+                    401: () => window.location.href="/",
+              },
+              headers: { "suresteps.session.token": localStorage.getItem("token")},
+              contentType: "application/text",
+              dataType: 'text'
+          });
+        } else{
+          $.ajax({
+              type: 'DELETE',
+              url: '/simulation',
+              statusCode:{
+                401: () => window.location.href="/",
+              },
+              headers: { "suresteps.session.token": localStorage.getItem("token")},
+              contentType: "application/text",
+              dataType: 'text'
+          });        }
+    }
 
     var saveRapidStepTest = (rapidStepTest) => {
         $.ajax({
             type: 'POST',
             url: '/rapidsteptest',
             data: JSON.stringify(rapidStepTest), // or JSON.stringify ({name: 'jonas'}),
-            success: function(data) {
-
+            statusCode:{
+                401: () => window.location.href="/",
             },
             headers: { "suresteps.session.token": localStorage.getItem("token")},
             contentType: "application/text",
@@ -52,7 +110,8 @@
             type: 'GET',
             url: '/riskscore/'+customer.email,
             success: function(data) {
-                document.getElementById('score').innerHTML = data;
+                var customerRisk = JSON.parse(data);
+                document.getElementById('score').innerHTML = customerRisk.score;
             },
             headers: { "suresteps.session.token": localStorage.getItem("token")},
             contentType: "application/text",
@@ -175,3 +234,7 @@
         second = second - 60 * minute + '';
         return minute + ':' + second + ':' + decisec;
     }
+
+    fetchToggleState();
+
+    setupUISocket();

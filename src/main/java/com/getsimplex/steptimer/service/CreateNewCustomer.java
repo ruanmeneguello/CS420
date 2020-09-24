@@ -22,6 +22,11 @@ public class CreateNewCustomer {
         String newCustomerRequest = request.body();
         Customer newCustomer = gson.fromJson(newCustomerRequest, Customer.class);
 
+        return createCustomer(newCustomer);
+
+    }
+
+    public static String createCustomer(Customer newCustomer) throws Exception{
         List<Customer> customers = JedisData.getEntityList(Customer.class);
         Predicate<Customer> findExistingCustomerPredicate = customer -> customer.getEmail().equals(newCustomer.getEmail());
         Optional<Customer> matchingCustomer = customers.stream().filter(findExistingCustomerPredicate).findAny();

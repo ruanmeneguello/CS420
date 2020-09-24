@@ -17,6 +17,7 @@ public class User {
     private String accountType;
     private String  birthDate;
     private String deviceNickName;
+    private boolean locked;
 
 
     public String getPassword() {
@@ -81,5 +82,13 @@ public class User {
 
     public void setDeviceNickName(String deviceNickName) {
         this.deviceNickName = deviceNickName;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

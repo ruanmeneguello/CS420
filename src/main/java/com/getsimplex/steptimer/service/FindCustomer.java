@@ -21,15 +21,20 @@ public class FindCustomer {
     public static String handleRequest(Request request) throws Exception{
         String customerEmail = request.params(":customer");
 
-        List<Customer> customers = JedisData.getEntityList(Customer.class);
-        Predicate<Customer> findExistingCustomerPredicate = customer -> customer.getEmail().equals(customerEmail);
-        Optional<Customer> matchingCustomer = customers.stream().filter(findExistingCustomerPredicate).findAny();
+        Optional<Customer> matchingCustomer = findCustomer(customerEmail);
 
         if (matchingCustomer.isPresent()){
             return gson.toJson(matchingCustomer.get());
         } else {
             return null;
         }
+    }
+
+    public static Optional<Customer> findCustomer(String customerEmail) throws Exception{
+        List<Customer> customers = JedisData.getEntityList(Customer.class);
+        Predicate<Customer> findExistingCustomerPredicate = customer -> customer.getEmail().equals(customerEmail);
+        Optional<Customer> matchingCustomer = customers.stream().filter(findExistingCustomerPredicate).findAny();
+        return matchingCustomer;
     }
 
 }

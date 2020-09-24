@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class DeviceRouter extends UntypedActor {
     private static Logger logger = Logger.getLogger(DeviceRouter.class.getName());
-    private static HashMap<String, Session> deviceRegistry = new HashMap<String, Session>();
+    private static HashMap<String, Session> deviceRegistry = new HashMap<String, Session>();//this is for the websocket to show the user the activity for the unique device
     private static HashMap<String,ActorRef> uniqueDeviceListeners = new HashMap<String, ActorRef>();
     private long lastMessageDate = 0l;	
 
@@ -29,12 +29,11 @@ public class DeviceRouter extends UntypedActor {
             DeviceMessage deviceMessage = (DeviceMessage) object;		
             logger.info("DeviceRouter received payload: "+deviceMessage.getMessage()+" with timestamp: "+deviceMessage.getDate());
             try {
-                if ((deviceMessage.getDate()-lastMessageDate>600) && deviceRegistry.containsKey(deviceMessage.getDeviceId())){//cancel out noise -- usually extra steps that aren't real happen within 500 milliseconds, but longer than that and it's real
-                    //getDeviceListener(deviceMessage.getDeviceId()).tell(object,self());
+                if (deviceRegistry.containsKey(deviceMessage.getDeviceId())){
                     deviceRegistry.get(deviceMessage.getDeviceId()).getRemote().sendString(deviceMessage.getMessage());
                 }
             } catch (Exception e){
-                logger.severe("Unable to unmarshal message: "+deviceMessage.getMessage());
+                logger.severe("Unable to transmit to socket message: "+deviceMessage.getMessage()+ "due to: "+e.getMessage());
             }
 	    lastMessageDate = deviceMessage.getDate();//update it	
 
@@ -43,7 +42,10 @@ public class DeviceRouter extends UntypedActor {
             if(!deviceRegistry.containsKey(deviceInterest.getDeviceId())){
                 deviceRegistry.put(deviceInterest.getDeviceId(),deviceInterest.getInterestedSession());
             } else {
+                deviceRegistry.get(deviceInterest.getDeviceId()).close();//we are moving to a different subscriber
                 logger.info("Device: "+deviceInterest.getDeviceId()+" is already being monitored.");
+                logger.info("Moving interest in Device: "+deviceInterest.getDeviceId()+"  as per latest request.");
+                deviceRegistry.put(deviceInterest.getDeviceId(),deviceInterest.getInterestedSession());
             }
         } else if (object instanceof DeviceInterestEnded){
             DeviceInterestEnded deviceInterestEnded = (DeviceInterestEnded) object;

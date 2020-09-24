@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
-import static com.getsimplex.steptimer.service.TokenController.*;
+import static com.getsimplex.steptimer.service.TokenService.*;
 import static com.getsimplex.steptimer.utils.JedisData.deleteFromRedis;
 
 /**

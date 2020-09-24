@@ -45,3 +45,14 @@ function setusername(){
 function setuserpassword(){
     password = $("#pw").val();
 }
+
+var enterFunction = (event) =>{
+    if (event.keyCode === 13){
+        event.preventDefault();
+        $("#loginbtn").click();
+    }
+}
+
+var passwordField = document.getElementById("pw");
+
+passwordField.addEventListener("keyup", enterFunction);

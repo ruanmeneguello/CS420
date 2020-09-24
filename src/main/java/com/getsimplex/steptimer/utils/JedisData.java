@@ -32,8 +32,8 @@ public class JedisData {
 
 
 
-    public static <T> ArrayList<T> getEntityList(Class clazz){
-        Set<String> set = JedisClient.getJedis().zrange(clazz.getSimpleName(), 0, -1);
+    public static synchronized <T> ArrayList<T> getEntityList(Class clazz) throws Exception{
+        Set<String> set = JedisClient.zrange(clazz.getSimpleName(), 0, -1);
         ArrayList<T> arrayList = new ArrayList<T>();
         for (String string:set){
             arrayList.add((T) gson.fromJson(string, clazz));
@@ -45,13 +45,13 @@ public class JedisData {
     public static <T> Long loadToJedis(List<T> list, String keyName) throws Exception{
         for (T object:list){
             String jsonFormatted = gson.toJson(object,object.getClass());
-            JedisClient.getJedis().zadd(keyName, 0, jsonFormatted);
+            JedisClient.zadd(keyName, 0, jsonFormatted);
         }
 
-        Long loadCount = JedisClient.getJedis().zcount(keyName,0d,-1);
+        Long loadCount = JedisClient.zcount(keyName,0d,-1);
 
         if (loadCount > list.size()){
-            JedisClient.getJedis().zremrangeByScore(keyName, 0, -1);
+            JedisClient.zremrangeByScore(keyName, 0, -1);
             throw new Exception("Attempt to load "+list.size()+" elements to key "+keyName+" failed by creating duplicates, reverting to empty list instead");
         }
 
@@ -61,11 +61,11 @@ public class JedisData {
 
     public static <T> void set(T object, String keyName) throws Exception{
         String jsonFormatted = gson.toJson(object, object.getClass());
-        JedisClient.getJedis().set(keyName, jsonFormatted);
+        JedisClient.set(keyName, jsonFormatted);
     }
 
     public static <T> T get(String keyName, Class clazz) throws Exception{
-        String jsonFormatted = JedisClient.getJedis().get(keyName);
+        String jsonFormatted = JedisClient.get(keyName);
         T object = (T) gson.fromJson(jsonFormatted, clazz);
         return object;
     }
@@ -111,7 +111,7 @@ public class JedisData {
 
     public static <T> Long deleteFromRedis (T record) throws Exception{
         String jsonFormatted = gson.toJson(record, record.getClass());
-        Long removeCount = JedisClient.getJedis().zrem(record.getClass().getSimpleName(),jsonFormatted);
+        Long removeCount = JedisClient.zrem(record.getClass().getSimpleName(),jsonFormatted);
         if (removeCount!=1){
             throw new Exception("Attempt to remove the following json from redis failed: "+jsonFormatted);
         }

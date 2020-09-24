@@ -1,5 +1,6 @@
 var userName = "";
 var password = "";
+var passwordRegEx=/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!]).{6,40})/;
 
 function setusername(){
     userName = $("#un").val();
@@ -7,10 +8,18 @@ function setusername(){
 
 function setuserpassword(){
     password = $("#pw").val();
+    var valid=passwordRegEx.exec(password);
+    if (!valid){
+        console.log('invalid password');
+    }
 }
 
 function setvpwd(){
     vpwd = $("#vpwd").val();
+    var valid=passwordRegEx.exec(vpwd);
+    if (!valid){
+        console.log('invalid password');
+    }
 }
 
 function savetoken(token){

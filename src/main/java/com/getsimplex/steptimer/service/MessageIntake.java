@@ -13,7 +13,7 @@ public class MessageIntake {
     private static ActorSystem system = ActorSystem.create("websocket");
     private static ActorRef messageRouter = system.actorOf(new RoundRobinPool(1).props(Props.create(MessageRouteByType.class)));//a pool of one means that only one actor is running at any moment and if it crashes, the actor restarts
 
-    public static String route(Object message){
+    public static synchronized String route(Object message){
         messageRouter.tell(message,ActorRef.noSender());
         return "Sent";
     }
