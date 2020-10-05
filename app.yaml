@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paymentservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paymentservice
+  template:
+    metadata:
+      labels:
+        app: paymentservice
+    spec:
+      containers:
+        - name: paymentservice
+          image: gcr.io/cubs-consulting/stedi
+          ports:
+            - containerPort: 443
+          resources:
+            limits:
+              cpu: ".5"
+              memory: "500Mi"
+            requests:
+              cpu: ".25"
+              memory: "250Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 4567
+            initialDelaySeconds: 3
+            periodSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stedi-service
+spec:
+  selector:
+    app: paymentservice
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 4567
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stedi-loadbalancer
+spec:
+  selector:
+    app: paymentservice
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 4567
+   
