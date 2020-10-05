@@ -5,7 +5,6 @@ import com.getsimplex.steptimer.com.getsimplex.steptimer.sensormessages.SensorMe
 import com.getsimplex.steptimer.model.DeviceInterest;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
-import sun.management.Sensor;
 
 import java.util.HashMap;
 import java.util.logging.Logger;
