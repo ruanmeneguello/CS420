@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: paymentservice
+  name: stedi
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: paymentservice
+      app: stedi
   template:
     metadata:
       labels:
-        app: paymentservice
+        app: stedi
     spec:
       containers:
-        - name: paymentservice
+        - name: stedi
           image: gcr.io/cubs-consulting/stedi
           ports:
             - containerPort: 443
@@ -37,7 +37,7 @@ metadata:
   name: stedi-service
 spec:
   selector:
-    app: paymentservice
+    app: stedi
   ports:
     - protocol: TCP
       port: 80
@@ -49,7 +49,7 @@ metadata:
   name: stedi-loadbalancer
 spec:
   selector:
-    app: paymentservice
+    app: stedi
   type: LoadBalancer
   ports:
     - port: 80
