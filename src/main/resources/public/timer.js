@@ -10,7 +10,7 @@
     var customer = JSON.parse(localStorage.getItem("customer"));
     var startandstopbutton;
     var counterbutton;
-    var timerUIWebSocket = new WebSocket(`ws${location.protocol=='https:'? 's': ''}://${location.hostname}:${location.port}/timeruiwebsocket`)
+//    var timerUIWebSocket = new WebSocket(`ws${location.protocol=='https:'? 's': ''}://${location.hostname}:${location.port}/timeruiwebsocket`)
 
     $(document).ready(function(){
         $('#dob').html(customer.birthDay);
@@ -32,12 +32,12 @@
         }
     };
 
-    var setupUISocket = () => {
-        timerUIWebSocket.onclose = () =>{
-            alert("The workspace or server has shut down this connection. You will be re-directed to the login page.")
-            window.location.href="/";
-        }
-    }
+//    var setupUISocket = () => {
+//        timerUIWebSocket.onclose = () =>{
+//            alert("The workspace or server has shut down this connection. You will be re-directed to the login page.")
+//            window.location.href="/";
+//        }
+//    }
 
     var fetchToggleState = () => {
 
@@ -237,4 +237,4 @@
 
     fetchToggleState();
 
-    setupUISocket();
+//    setupUISocket();
