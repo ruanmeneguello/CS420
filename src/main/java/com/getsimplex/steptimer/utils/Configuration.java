@@ -16,6 +16,7 @@ public class Configuration {
 
         //This overrides classpath config file
         String configFilePath=System.getProperty("config");//ex: /home/workspae/stedi-application/application.conf
+System.out.println("****** Config File Path: "+configFilePath);
         if (configFilePath!=null && configFilePath!=""){
             File configFile=new File(configFilePath);
             config = ConfigFactory.parseFile(configFile);

@@ -32,12 +32,12 @@
         }
     };
 
-//    var setupUISocket = () => {
-//        timerUIWebSocket.onclose = () =>{
-//            alert("The workspace or server has shut down this connection. You will be re-directed to the login page.")
-//            window.location.href="/";
-//        }
-//    }
+    var setupUISocket = () => {
+        timerUIWebSocket.onclose = () =>{
+            alert("The workspace or server has shut down this connection. You will be re-directed to the login page.")
+            window.location.href="/";
+        }
+    }
 
     var fetchToggleState = () => {
 
@@ -237,4 +237,4 @@
 
     fetchToggleState();
 
-//    setupUISocket();
+    setupUISocket();
