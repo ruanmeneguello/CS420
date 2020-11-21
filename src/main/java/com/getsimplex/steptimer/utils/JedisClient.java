@@ -11,14 +11,35 @@ import java.util.Set;
  */
 public class JedisClient {
 
-    private static Config config = Configuration.getConfiguration();
-    private static String password = config.getString("redis.password");
-    private static String host = config.getString("redis.host");
-    private static String port = config.getString("redis.port");
-    private static String dbName = config.getString("redis.db");
-    private static String url = "redis://:"+password+"@"+host+":"+port+"/"+dbName;
-    private static Jedis jedis  = new Jedis(url);
+    private static Config config;
+    private static String password;
+    private static String host;
+    private static String port;
+    private static String dbName;
+    private static String url;
+    private static Jedis jedis;
 
+    static {
+        Config config = Configuration.getConfiguration();
+        if (System.getenv("REDIS_HOST")!=null && !System.getenv("REDIS_HOST").isEmpty()){
+
+            password = System.getenv("REDIS_PASSWORD");
+            host = System.getenv("REDIS_HOST");
+            port = System.getenv("REDIS_PORT");
+            dbName = System.getenv("REDIS_DB");
+            url = "redis://:"+password+"@"+host+":"+port+"/"+dbName;
+
+        } else{
+            config = Configuration.getConfiguration();
+            password = config.getString("redis.password");
+            host = config.getString("redis.host");
+            port = config.getString("redis.port");
+            dbName = config.getString("redis.db");
+            url = "redis://:"+password+"@"+host+":"+port+"/"+dbName;
+
+        }
+        jedis  = new Jedis(url);
+    }
 
     public static synchronized Jedis getJedis(){
 
@@ -29,7 +50,7 @@ public class JedisClient {
         catch (Exception e){
             jedis = new Jedis(url);
         }
-    return jedis;
+        return jedis;
     }
 
     public static synchronized void set(String key, String value) throws Exception{

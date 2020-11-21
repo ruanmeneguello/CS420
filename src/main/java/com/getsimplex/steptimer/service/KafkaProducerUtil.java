@@ -1,4 +1,6 @@
 package com.getsimplex.steptimer.service;
+import com.getsimplex.steptimer.utils.Configuration;
+import com.typesafe.config.Config;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -10,7 +12,18 @@ import java.util.Properties;
 
 public class KafkaProducerUtil {
 
-    private final static String BOOTSTRAP_SERVERS = "localhost:9092";
+    private static String BOOTSTRAP_SERVERS = "localhost:9092";
+
+    static {
+        Config config = Configuration.getConfiguration();
+        if (System.getenv("KAFKA_BROKER")!=null && !System.getenv("KAFKA_BROKER").isEmpty()){
+            BOOTSTRAP_SERVERS = System.getenv("KAFKA_BROKER");
+        }
+        else {
+            BOOTSTRAP_SERVERS= config.getString("kafka.broker");
+        }
+
+    }
 
     public static Producer<Long, String>    createProducer(){
 

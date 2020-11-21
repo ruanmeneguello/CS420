@@ -1,5 +1,6 @@
 package com.getsimplex.steptimer.service;
 import com.getsimplex.steptimer.utils.Configuration;
+import com.typesafe.config.Config;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.common.serialization.LongDeserializer;
@@ -12,9 +13,22 @@ import java.util.Properties;
 public class KafkaConsumerUtil {
 
     //private final static String TOPIC = "customer-risk";
-    private final static String TOPIC = Configuration.getConfiguration().getString("kafka.riskTopic");
+    private static String TOPIC;
 
-    private final static String BOOTSTRAP_SERVERS = "localhost:9092";
+    private static String BOOTSTRAP_SERVERS = "localhost:9092";
+
+    static {
+        Config config = Configuration.getConfiguration();
+        if (System.getenv("KAFKA_BROKER")!=null && !System.getenv("KAFKA_BROKER").isEmpty()){
+            BOOTSTRAP_SERVERS = System.getenv("KAFKA_BROKER");
+            TOPIC = System.getenv("KAFKA_RISK_TOPIC");
+        }
+        else {
+            BOOTSTRAP_SERVERS= config.getString("kafka.broker");
+            TOPIC = Configuration.getConfiguration().getString("kafka.riskTopic");
+        }
+
+    }
 
     public static Consumer<Long, String> createConsumer(){
 
