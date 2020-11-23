@@ -18,6 +18,24 @@ steps:
       - 'push'
       - 'gcr.io/$PROJECT_ID/stedi:$SHORT_SHA'
 
+  # This step builds the container image.
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build-Latest
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/stedi:latest'
+      - '.'
+
+  # This step pushes the image to Container Registry
+  # The PROJECT_ID and SHORT_SHA variables are automatically
+  # replaced by Cloud Build.
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Push-Latest
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/stedi:latest'
+
   # This step deploys the application in Kubernetes
   - name: 'gcr.io/cloud-builders/gke-deploy'
     args:
