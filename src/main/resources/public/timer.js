@@ -10,7 +10,7 @@
     var customer = JSON.parse(localStorage.getItem("customer"));
     var startandstopbutton;
     var counterbutton;
-//    var timerUIWebSocket = new WebSocket(`ws${location.protocol=='https:'? 's': ''}://${location.hostname}:${location.port}/timeruiwebsocket`)
+    var timerUIWebSocket = new WebSocket(`ws${location.protocol=='https:'? 's': ''}://${location.hostname}:${location.port}/timeruiwebsocket`)
 
     $(document).ready(function(){
         $('#dob').html(customer.birthDay);
