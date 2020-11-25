@@ -36,7 +36,19 @@ steps:
       - 'push'
       - 'gcr.io/$PROJECT_ID/stedi:latest'
 
-  # This step deploys the application in Kubernetes
+  # This step stops the stedi pod
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: Stop Pod
+    args:
+      - 'scale'
+      - 'deploy'
+      - 'stedi'
+      - '--replicas=0'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-1'
+
+      # This step deploys the application in Kubernetes
   - name: 'gcr.io/cloud-builders/gke-deploy'
     args:
       - run
@@ -44,3 +56,15 @@ steps:
       - --image=gcr.io/$PROJECT_ID/stedi:$SHORT_SHA
       - --location=us-east1-b
       - --cluster=cluster-1
+
+  # This step scales up the stedi pod
+  - name: 'gcr.io/cloud-builders/kubectl'
+    id: Start Pod
+    args:
+      - 'scale'
+      - 'deploy'
+      - 'stedi'
+      - '--replicas=1'
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-1'
