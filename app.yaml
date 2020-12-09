@@ -81,3 +81,26 @@ spec:
   ports:
     - port: 80
       targetPort: 4567
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: stedi-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: stedi-public
+    networking.gke.io/managed-certificates: stedi-certificate
+spec:
+  backend:
+    serviceName: stedi-nodeport
+    servicePort: 80
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: stedi-certificate
+spec:
+  domains:
+    - stedi.me
+    - dev.stedi.me
+    - test.stedi.me
+
