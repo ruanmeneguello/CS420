@@ -15,6 +15,20 @@ spec:
       containers:
         - name: stedi
           image: gcr.io/cubs-consulting/stedi
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: password
+            - name: REDIS_HOST
+              value: "redis-12921.c114.us-east-1-4.ec2.cloud.redislabs.com"
+            - name: REDIS_PORT
+              value: 12921
+            - name: REDIS_DB
+              value: 0
+            - name: KAFKA_BROKER
+              value: localhost:9092
           ports:
             - containerPort: 443
           resources:
