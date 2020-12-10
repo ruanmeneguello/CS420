@@ -87,10 +87,9 @@ kind: Ingress
 metadata:
   name: stedi-ingress
   annotations:
-    kubernetes.io/ingress.class: "nginx"
     kubernetes.io/ingress.global-static-ip-name: stedi-public
     networking.gke.io/managed-certificates: stedi-certificate
-    ingress.kubernetes.io/force-ssl-redirect: "true"
+    kubernetes.io/ingress.allow-http: "false"
 spec:
   backend:
     serviceName: stedi-nodeport
