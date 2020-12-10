@@ -100,7 +100,5 @@ metadata:
   name: stedi-certificate
 spec:
   domains:
-    - stedi.me
     - dev.stedi.me
-    - test.stedi.me
-
+    
