@@ -90,6 +90,7 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: stedi-public
     networking.gke.io/managed-certificates: stedi-certificate
     kubernetes.io/ingress.allow-http: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   backend:
     serviceName: stedi-nodeport
