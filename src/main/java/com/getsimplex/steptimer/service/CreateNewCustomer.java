@@ -37,7 +37,7 @@ public class CreateNewCustomer {
 
         if (newCustomer != null && !newCustomer.getCustomerName().isEmpty()) {
             //SAVE USER TO REDIS
-            JedisData.loadToJedis(newCustomer, Customer.class);
+            JedisData.loadToJedis(newCustomer, newCustomer.getEmail());
         }
         return "Welcome: " + newCustomer.getCustomerName();
     }

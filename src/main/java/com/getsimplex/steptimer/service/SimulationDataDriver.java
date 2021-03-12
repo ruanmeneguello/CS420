@@ -91,7 +91,7 @@ public class SimulationDataDriver {
                  rapidStepTest.setStartTime(rapidStepTest.getStopTime() - testTime);
                  rapidStepTest.setTestTime(testTime);
                  rapidStepTest.setTotalSteps(30);
-                 JedisData.loadToJedis(rapidStepTest, RapidStepTest.class);
+                 JedisData.loadToJedis(rapidStepTest, UUID.randomUUID().toString(), rapidStepTest.getStopTime());
                  Thread.sleep(2000);//2 seconds sleep time between each message makes a new message every minute for every customer assuming 30 test customers
                  String riskScoreJson = StepHistory.riskScore(testCustomer.getEmail());//this is logged, and we don't actually need it right here, we just want it to be visible for logging purposes
 

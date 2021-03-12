@@ -93,7 +93,7 @@ public class CreateNewUser {
 
 
         //SAVE USER TO REDIS
-        JedisData.loadToJedis(addUser,User.class);
+        JedisData.loadToJedis(addUser, addUser.getEmail());
 
         return "Welcome: " + addUser.getUserName() + " Your account has been created, please login.";
 

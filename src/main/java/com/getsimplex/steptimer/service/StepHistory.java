@@ -41,7 +41,7 @@ public class StepHistory {
         Tail tail = gson.fromJson(request.body(),Tail.class);
         tail.setSessionId(tokenString);
 
-        JedisData.loadToJedis(tail,Tail.class);
+        JedisData.loadToJedis(tail,tail.getSessionId(), tail.getMilliseconds());
 
         return tokenString;
     }

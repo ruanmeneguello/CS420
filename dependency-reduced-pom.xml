@@ -7,8 +7,16 @@
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>13</source>
+          <target>13</target>
+        </configuration>
+      </plugin>
+      <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>2.4.2</version>
+        <version>3.2.4</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -40,9 +48,4 @@
       </plugin>
     </plugins>
   </build>
-  <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-  </properties>
 </project>
-

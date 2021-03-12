@@ -20,6 +20,6 @@ public class SaveRapidStepTest {
     public static void save(String rapidStepTestString) throws Exception{
 
         RapidStepTest rapidStepTest = gson.fromJson(rapidStepTestString, RapidStepTest.class);
-        JedisData.loadToJedis(rapidStepTest, RapidStepTest.class);
+        JedisData.loadToJedis(rapidStepTest,UUID.randomUUID().toString(), rapidStepTest.getStopTime());
     }
 }

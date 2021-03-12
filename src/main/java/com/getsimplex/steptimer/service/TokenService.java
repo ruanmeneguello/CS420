@@ -30,7 +30,7 @@ public class TokenService {
             LoginToken expiredToken = expiredTokenOptional.get();
             JedisData.deleteFromRedis(expiredToken);//should delete as long as object was not modified since reading from redis
             expiredToken.setExpiration(new Date(System.currentTimeMillis()+Long.valueOf(10*60*1000)));
-            JedisData.loadToJedis(expiredToken,LoginToken.class);
+            JedisData.loadToJedis(expiredToken,expiredToken.getUuid());
         }
         return expiredTokenOptional;
     }
@@ -72,7 +72,7 @@ public class TokenService {
             Date expirationDate = new Date(expiration);
             token.setExpiration(expirationDate);
         }
-        JedisData.loadToJedis(token, LoginToken.class);
+        JedisData.loadToJedis(token, token.getUuid());
         return tokenString;
 
     }
