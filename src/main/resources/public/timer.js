@@ -240,4 +240,3 @@
 
     fetchToggleState();
 
-    setupUISocket();
