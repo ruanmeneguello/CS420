@@ -10,11 +10,21 @@
     var customer = JSON.parse(localStorage.getItem("customer"));
     var startandstopbutton;
     var counterbutton;
+    let acl = new Accelerometer({frequency: 60});
+
 
     $(document).ready(function(){
         $('#dob').html(customer.birthDay);
         startandstopbutton = document.getElementById('startandstopbutton');
         counterbutton = document.getElementById('counterbutton');
+
+        acl.addEventListener('reading', () => {
+          console.log("Acceleration along the X-axis " + acl.x);
+          console.log("Acceleration along the Y-axis " + acl.y);
+          console.log("Acceleration along the Z-axis " + acl.z);
+        });
+
+        acl.start();
 
     });
 //    var webSocket  = new WebSocket("ws://"+location.hostname+":"+location.port+"/socket");
