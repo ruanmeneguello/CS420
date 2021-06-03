@@ -4,3 +4,4 @@
 /build/
 /.gradle/
 dependency-reduced-pom.xml
+dump.rdb
