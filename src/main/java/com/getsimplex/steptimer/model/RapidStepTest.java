@@ -6,7 +6,7 @@ import java.util.Date;
 /**
  * Created by Administrator on 10/17/2016.
  */
-public class RapidStepTest {
+public class RapidStepTest implements Comparable<RapidStepTest>{
     private String token;
     private String userName;
     private String customerPhone;
@@ -18,6 +18,11 @@ public class RapidStepTest {
     private Integer totalSteps;
     private Integer feelingScore;
     private Customer customer;
+
+    @Override
+    public int compareTo(RapidStepTest rapidStepTest){
+        return this.stopTime.compareTo(rapidStepTest.stopTime);
+    }
 
     public String getToken() {
         return token;

@@ -292,7 +292,7 @@ public class JedisClient {
         List<String> valueList = jedis.hmget(mapName, key);
         jedisPool.returnResource(jedis);
         Optional<String> valueOptional = Optional.empty();
-        if (valueList.size()==1){
+        if (valueList.size()==1 && valueList.get(0)!=null){
             valueOptional = Optional.of(valueList.get(0));
         } else if (valueList.size()>1){
             throw new Exception("Map: "+mapName+" and Key: "+key+" returned "+valueList.size()+" values: should only return one or zero.");

@@ -31,9 +31,7 @@ public class FindCustomer {
     }
 
     public static Optional<Customer> findCustomer(String customerEmail) throws Exception{
-        List<Customer> customers = JedisData.getEntityList(Customer.class);
-        Predicate<Customer> findExistingCustomerPredicate = customer -> customer.getEmail().equals(customerEmail);
-        Optional<Customer> matchingCustomer = customers.stream().filter(findExistingCustomerPredicate).findAny();
+        Optional<Customer> matchingCustomer = JedisData.getEntityById(Customer.class, customerEmail);
         return matchingCustomer;
     }
 

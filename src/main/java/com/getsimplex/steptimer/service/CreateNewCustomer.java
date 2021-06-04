@@ -6,6 +6,7 @@ import com.getsimplex.steptimer.utils.JedisData;
 import com.google.gson.Gson;
 import spark.Request;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -27,17 +28,19 @@ public class CreateNewCustomer {
     }
 
     public static String createCustomer(Customer newCustomer) throws Exception{
-        List<Customer> customers = JedisData.getEntityList(Customer.class);
-        Predicate<Customer> findExistingCustomerPredicate = customer -> customer.getEmail().equals(newCustomer.getEmail());
-        Optional<Customer> matchingCustomer = customers.stream().filter(findExistingCustomerPredicate).findAny();
+//        List<Customer> customers = JedisData.getEntityList(Customer.class);
+//        Predicate<Customer> findExistingCustomerPredicate = customer -> customer.getEmail().equals(newCustomer.getEmail());
+        Optional<Customer> matchingCustomer = JedisData.getEntityById(Customer.class, newCustomer.getEmail());
 
         if (matchingCustomer.isPresent()){
             throw new Exception("Customer already exists");
         }
 
-        if (newCustomer != null && !newCustomer.getCustomerName().isEmpty()) {
+        if (newCustomer != null && !newCustomer.getCustomerName().isEmpty() && !newCustomer.getEmail().isEmpty()) {
             //SAVE USER TO REDIS
-            JedisData.loadToJedis(newCustomer, newCustomer.getEmail());
+            JedisData.loadToJedis(newCustomer, newCustomer.getEmail(), Long.valueOf(newCustomer.getPhone()));
+        } else{
+            throw new Exception("Customer must have a non-empty name and email address");
         }
         return "Welcome: " + newCustomer.getCustomerName();
     }

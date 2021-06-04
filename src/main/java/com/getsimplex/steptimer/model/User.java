@@ -14,7 +14,6 @@ public class User {
     private String verifyPassword;
     private String email;
     private String phone;
-    private String accountType;
     private String  birthDate;
     private String deviceNickName;
     private boolean locked;
@@ -58,14 +57,6 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getAccountType() {
-        return accountType;
-    }
-
-    public void setAccountType(String accountType) {
-        this.accountType = accountType;
     }
 
     public String getBirthDate() {

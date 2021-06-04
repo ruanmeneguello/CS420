@@ -19,18 +19,7 @@ public class WebAppRunner {
 
     public static void main(String[] args){
 
-        MessageIntake.route(new StartReceivingKafkaMessages());//connect to customer-risk topic
-
         Spark.port(getHerokuAssignedPort());
-
-        createTestUser();
-
-        createTestCustomer();
-
-        if ("true".equals(System.getProperty("simulation"))){
-            startSimulationData();
-        }
-
 
 		//secure("/Applications/steptimerwebsocket/keystore.jks","password","/Applications/steptimerwebsocket/keystore.jks","password");
         staticFileLocation("/public");
@@ -56,7 +45,6 @@ public class WebAppRunner {
         post("/customer", (req, res)-> {
             String newLocation;
             try {
-                userFilter(req, res);
                 createNewCustomer(req, res);
                 newLocation="/timer.html";
             } catch (Exception e){
@@ -98,7 +86,7 @@ public class WebAppRunner {
             }
             return riskScore(req.params(":customer"));
         }));
-        //post ("/sensorTail",(req,res) -> saveTail(req,res) );
+
 
         init();
     }
@@ -125,13 +113,7 @@ public class WebAppRunner {
 
     }
 
-    public static String saveTail(Request req, Response res) throws Exception{
-        return StepHistory.saveSensorTail(req);
-    }
 
-    public static String routePdfRequest(Request req, Response res) throws Exception{
-        return WebServiceHandler.routePdfRequest(req, res);
-    }
 
     public static void createNewCustomer(Request request, Response response) throws Exception{
             CreateNewCustomer.handleRequest(request);
@@ -163,36 +145,4 @@ public class WebAppRunner {
         return Configuration.getConfiguration().getInt("suresteps.port"); //return default port if heroku-port isn't set (i.e. on localhost)
     }
 
-    private static void createTestUser(){//for Udacity course local use only
-
-        try {
-            User user = new User();
-            user.setUserName("clinicmanager");
-            user.setPassword("Cl1n1cM@n@ger");
-            user.setVerifyPassword("Cl1n1cM@n@ger");
-            user.setAccountType("personal");
-            CreateNewUser.createUser(user);
-        } catch (Exception e){
-            System.out.println("Unable to create test user due to exception: "+e.getMessage());
-        }
-    }
-
-    private static void createTestCustomer() {
-        try{
-            Customer customer = new Customer();
-            customer.setCustomerName("Steady Senior");
-            customer.setEmail("steady@stedi.fit");
-            customer.setPhone("8015551212");
-            customer.setBirthDay("1901-01-01");
-            CreateNewCustomer.createCustomer(customer);
-        }
-        catch (Exception e){
-            System.out.println("Unable to create customer due to exception: "+e.getMessage());
-        }
-    }
-
-    private static void startSimulationData(){
-        StartSimulation startSimulation = new StartSimulation(30);
-        MessageIntake.route(startSimulation);
-    }
 }

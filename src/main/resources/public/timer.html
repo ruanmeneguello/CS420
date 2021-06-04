@@ -8,14 +8,6 @@
 		<link rel="shortcut icon" href= "favicon.ico" type="image/x-icon" />
 	</head>
 	<body>
-		<div class="slider-right-corner">
-			Activate Simulated User Data
-			<label class="switch">
-				<input id="enablesimulationcheckbox" type="checkbox" onchange="simulationUpdate(this);">
-				<span class="slider round"></span>
-			</label>
-		</div>
-
 		<p class="stepcount">Date of Birth: <a id="dob"></a></p>
 	<div style="text-align:center">
 	<p>
@@ -31,20 +23,9 @@
 	<p>
 		<input class="btn btn-lg btn-primary" id="resetbutton" value="Reset Stopwatch" onclick="resetstopwatch();" type="button"><br>
 	</p>
-   	 <p class="stepcount">Step Count: <a id="clicks">0</a></p>
+   	<p class="stepcount">Step Count: <a id="clicks">0</a></p>
 	<p class="stepcount">Risk Score: <a id="score"></a></p>
-		<br>
-		<p>
-			<a  class="stepcount" id="risk-graph" href="/risk-graph.html">Risk Graph</a>
-		</p>
-	<br>
-		<p>
-			<a  class="stepcount" id="findusr" href="/findcustomer.html">Select Customer</a>
-		</p>
-	<br>
-		<p>
-			<a  class="stepcount" id="newusr" href="/createcustomer.html">Create New Customer</a>
-		</p>
+	<p><a class="stepcount" id="logout" href="/">Log Out</a></p>
 	</div>
 	
 	</body>

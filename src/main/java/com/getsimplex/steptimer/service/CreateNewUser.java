@@ -2,6 +2,7 @@ package com.getsimplex.steptimer.service;
 
 import com.google.gson.Gson;
 import com.getsimplex.steptimer.model.User;
+import org.apache.commons.codec.digest.DigestUtils;
 import spark.Request;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -35,26 +36,19 @@ public class CreateNewUser {
         String verifyPassword = createUser.getVerifyPassword();
         String email = createUser.getEmail();
         String phone = createUser.getPhone();
-        String accttype = createUser.getAccountType();
         String bday = createUser.getBirthDate();
         String deviceId = createUser.getDeviceNickName();
 
 
         if (userName != null && !userName.isEmpty()) {
 
-            ArrayList<User> users = JedisData.getEntityList(User.class);
-            Predicate<User> userPredicate = user -> user.getUserName().equals(userName);
-            Optional<User> userOptional = users.stream().filter(userPredicate).findFirst();
-            if (userOptional.isPresent()) {
-                User currentUser = userOptional.get();
-                String newUserName = currentUser.getUserName();
+            Optional<User> existingUser = JedisData.getEntityById(User.class,  createUser.getUserName());
 
-                if (newUserName.equals(userName)) {
-                    throw new Exception("Username already exists");
-                } else {
-                    addUser.setUserName(userName);
-                }
-            }else {
+            if (existingUser.isPresent()) {
+
+                throw new Exception("Username already exists");
+
+            } else {
                 addUser.setUserName(userName);
             }
         }
@@ -64,8 +58,9 @@ public class CreateNewUser {
         }else if(!validatePassword(password)) {
             throw new Exception ("Your password must contain a lowercase and uppercase letter, a number, a special character, and be between 6 and 40 characters long.");
         }else{
-            String newPw = JasyptPwSecurity.encrypt(password);
-            addUser.setPassword(newPw);
+            String sha256HashPass = DigestUtils.sha256Hex(verifyPassword);
+            addUser.setPassword(sha256HashPass);
+            addUser.setVerifyPassword(sha256HashPass);
         }
 
         if (email != null && !email.isEmpty()) {
@@ -83,17 +78,13 @@ public class CreateNewUser {
             addUser.setBirthDate(birthdate);
         }
 
-        if (accttype != null && !accttype.isEmpty()) {
-            addUser.setAccountType(accttype);
-        }
-
         if (deviceId != null && !deviceId.isEmpty()){
             addUser.setDeviceNickName(deviceId);
         }
 
 
         //SAVE USER TO REDIS
-        JedisData.loadToJedis(addUser, addUser.getUserName());
+        JedisData.loadToJedis(addUser, addUser.getUserName(), Long.valueOf(addUser.getPhone()));
 
         return "Welcome: " + addUser.getUserName() + " Your account has been created, please login.";
 

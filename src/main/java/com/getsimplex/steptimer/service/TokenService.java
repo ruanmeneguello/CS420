@@ -16,10 +16,7 @@ import static com.getsimplex.steptimer.utils.JedisData.deleteFromRedis;
 public class TokenService {
 
     public static Optional<LoginToken> lookupToken(String userToken)throws Exception {
-        ArrayList<LoginToken> allTokens = JedisData.getEntityList(LoginToken.class);
-        Predicate<LoginToken> tokenPredicate = token -> token.getUuid().equals(userToken);
-       // Predicate<LoginToken> activePredicate = token -> token.getExpires() && token.getExpiration().after(new Date());
-        Optional<LoginToken> tokenOptional = allTokens.stream().filter(tokenPredicate).findFirst();
+        Optional<LoginToken> tokenOptional = JedisData.getEntityById(LoginToken.class, userToken);
 
         return tokenOptional;
     }
@@ -28,7 +25,6 @@ public class TokenService {
         Optional<LoginToken> expiredTokenOptional = lookupToken(userToken);
         if (expiredTokenOptional.isPresent() && expiredTokenOptional.get().getExpires() && expiredTokenOptional.get().getExpiration().before(new Date())){
             LoginToken expiredToken = expiredTokenOptional.get();
-            JedisData.deleteFromRedis(expiredToken);//should delete as long as object was not modified since reading from redis
             expiredToken.setExpiration(new Date(System.currentTimeMillis()+Long.valueOf(10*60*1000)));
             JedisData.loadToJedis(expiredToken,expiredToken.getUuid());
         }
@@ -47,14 +43,8 @@ public class TokenService {
     }
 
     public static String createUserToken(String userName)throws Exception{
-        ArrayList<User> allUsers = JedisData.getEntityList(User.class);
-        Predicate<User> userPredicate = user -> user.getUserName().equals(userName);
-        Predicate<User> personalTypePredicate = personal -> personal.getAccountType().equals("personal");
-//        Predicate<User> businessTypePredicate = business -> business.getAccountType().equals("Business");
 
-        Optional<User> personalOptional = allUsers.stream().filter(userPredicate).filter(personalTypePredicate).findFirst();
-//        Optional<User> businessOptional = allUsers.stream().filter(userPredicate).filter(businessTypePredicate).findFirst();
-
+        Optional<User> userOptional = JedisData.getEntityById(User.class,userName);
         String tokenString = UUID.randomUUID().toString();
         Long currentTimeMillis = System.currentTimeMillis();
         LoginToken token = new LoginToken();
@@ -62,7 +52,7 @@ public class TokenService {
         token.setUuid(tokenString);
         token.setUser(userName);
 
-        if (personalOptional.isPresent()) {
+        if (userOptional.isPresent()) {
             Long expiration = currentTimeMillis + 10 * 60 * 1000;  // expires after 10 minutes
             Date expirationDate = new Date(expiration);
             token.setExpiration(expirationDate);
@@ -78,9 +68,7 @@ public class TokenService {
     }
 
     public static Boolean validateToken(String tokenString) throws Exception{
-        ArrayList<LoginToken> allTokens = JedisData.getEntityList(LoginToken.class);
-        Predicate<LoginToken> tokenPredicate = token -> token.getUuid().equals(tokenString);
-        Optional<LoginToken> matchingToken=allTokens.stream().filter(tokenPredicate).findFirst();
+        Optional<LoginToken> matchingToken=JedisData.getEntityById(LoginToken.class, tokenString);
 
         Boolean expired = false;
         if (matchingToken.isPresent() && matchingToken.get().getExpires() && matchingToken.get().getExpiration().before(new Date())){

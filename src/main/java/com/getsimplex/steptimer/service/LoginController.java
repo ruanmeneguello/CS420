@@ -5,6 +5,7 @@ import com.getsimplex.steptimer.model.LoginRequest;
 import com.getsimplex.steptimer.model.LoginToken;
 import com.getsimplex.steptimer.model.User;
 import com.getsimplex.steptimer.utils.*;
+import org.apache.commons.codec.digest.DigestUtils;
 import spark.Request;
 import com.getsimplex.steptimer.utils.JedisClient;
 import com.getsimplex.steptimer.utils.JedisData;
@@ -33,12 +34,7 @@ public class LoginController {
     public static String tryLogin(String userName, String password) throws Exception{
         if(isValidPassword(userName, password)){
 
-           //create logintoken for user - save in redis
-                ArrayList<LoginToken> allTokens = JedisData.getEntityList(LoginToken.class);
-                Predicate<LoginToken> tokenPredicate = token -> token.getUser().equals(userName);
-
-                String newToken = "";
-                newToken = createUserToken(userName);
+                String newToken = createUserToken(userName);
                 return newToken;
         }else{
             throw new Exception("Invalid Login");
@@ -64,11 +60,11 @@ public class LoginController {
             }
 
             if (userNameIsValid) {
-                String userName = currentUser.getUserName();
-                String encryptedPassword = currentUser.getPassword();
-                Boolean pwTrue = JasyptPwSecurity.checkPw(attemptedPwValue, encryptedPassword);
 
-                if (encryptedPassword != null && !encryptedPassword.isEmpty() && pwTrue) {
+                String storedHashedPassword = currentUser.getPassword();
+                String attemptedHashedPassword = DigestUtils.sha256Hex(attemptedPwValue);
+
+                if (storedHashedPassword.equals(attemptedHashedPassword)) {
                     passwordIsValid = true;
                 }
             }
