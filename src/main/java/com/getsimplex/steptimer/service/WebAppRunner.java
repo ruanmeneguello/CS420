@@ -46,7 +46,7 @@ public class WebAppRunner {
             String newLocation;
             try {
                 createNewCustomer(req, res);
-                newLocation="/timer.html";
+                newLocation="/";
             } catch (Exception e){
                 System.out.println("*** Error Creating Customer: "+e.getMessage());
                 newLocation="/";
