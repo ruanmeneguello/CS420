@@ -3,7 +3,7 @@
     let runningstate = 0; // 1 means the timecounter is running 0 means counter stopped
     let stoptime = 0;
     let currenttime;
-    let usertoken=localStorage.getItem("token");
+    let usertoken="";//initialize to empty string
     let stepsTaken = [];
     let starttime;
     let previousStepTime;
@@ -13,15 +13,15 @@
 
 
     $(document).ready(function(){
-        if (customer==null){
-            window.location.href="/";//they cleared their cache or went to the timer link without logging in, but we need them to log in first
-        }
-        $('#dob').html(customer.birthDay);
         startandstopbutton = document.getElementById('startandstopbutton');
         counterbutton = document.getElementById('counterbutton');
-
-        let logoutLink = document.getElementById("logout");
-        logoutLink.onClick = () => {localStorage.removeItem("token"); localStorage.removeItem("customer")};
+        let hash= location.hash;//will include the #
+        let hashparts = hash.split("#");
+        if (hashparts.length < 2) {
+            window.location="/"; //there is no login token on the url, so they must not have logged in yet, we will help redirect them here
+        } else {
+            usertoken = hashparts[1];// the url should look like https://stedi.me/timer.html#4c2286a7-8fdc-47c5-b972-739769554c88
+        }
     });
 
     document.onkeyup = (e) => {

@@ -52,9 +52,7 @@ function userlogin(){
         url: '/login',
         data: JSON.stringify({userName, password}),
         success: function(data) {
-            savetoken(data);
-            findcustomer(userName);//this sets the local storage to the correct customer at login
-            window.location.href = "/timer.html";
+            window.location.href = "/timer.html#"+data;//add the token to the url
         },
         contentType: "application/text",
         dataType: 'text'
