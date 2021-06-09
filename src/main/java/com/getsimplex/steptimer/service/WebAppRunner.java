@@ -29,7 +29,7 @@ public class WebAppRunner {
         //post("/generateHistoricalGraph", (req, res)->routePdfRequest(req, res));
         //get("/readPdf", (req, res)->routePdfRequest(req, res));
         post("/user", (req, res)-> callUserDatabase(req));
-
+        get("/validate/:token", (req,res)->TokenController.validateToken(req.params(":token")));
         get("/simulation", (req, res) -> SimulationDataDriver.getSimulationActive());
         post("/simulation", (req, res)-> MessageIntake.route(new StartSimulation(30)));
         delete("/simulation", (req, res)-> MessageIntake.route(new StopSimulation()));

@@ -1,17 +1,11 @@
 package com.getsimplex.steptimer.service;
 
-import com.getsimplex.steptimer.model.LoginToken;
 import com.getsimplex.steptimer.utils.JedisData;
 import com.getsimplex.steptimer.model.Token;
 import com.getsimplex.steptimer.model.ValidationResponse;
 import org.eclipse.jetty.websocket.api.Session;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Optional;
-import java.util.function.Predicate;
-import static com.getsimplex.steptimer.service.TokenService.*;
 
 /**
  * Created by sean on 8/12/2016.
@@ -52,7 +46,7 @@ public class SessionValidator {
     }
 
     public static Boolean validateToken(String tokenString) throws Exception{
-        return TokenService.validateToken(tokenString);
+        return TokenService.isExpired(tokenString);
     }
 
 

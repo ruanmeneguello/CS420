@@ -60,7 +60,7 @@ public class TokenService {
 
     }
 
-    public static Boolean validateToken(String tokenString) throws Exception{
+    public static Boolean isExpired(String tokenString) throws Exception{
         Optional<LoginToken> matchingToken=JedisData.getEntityById(LoginToken.class, tokenString);
 
         Boolean expired = false;
