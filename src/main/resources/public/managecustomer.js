@@ -13,7 +13,7 @@ function setemail(){
 }
 
 function setphone(){
-    phone = $("#phone").val();
+    phone = $("#phone").val().replace(/\D+/g, "");
 }
 
 function setbday(){

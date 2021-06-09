@@ -44,7 +44,6 @@ public class TokenService {
 
     public static String createUserToken(String userName)throws Exception{
 
-        Optional<User> userOptional = JedisData.getEntityById(User.class,userName);
         String tokenString = UUID.randomUUID().toString();
         Long currentTimeMillis = System.currentTimeMillis();
         LoginToken token = new LoginToken();
@@ -52,16 +51,10 @@ public class TokenService {
         token.setUuid(tokenString);
         token.setUser(userName);
 
-        if (userOptional.isPresent()) {
-            Long expiration = currentTimeMillis + 10 * 60 * 1000;  // expires after 10 minutes
-            Date expirationDate = new Date(expiration);
-            token.setExpiration(expirationDate);
+        Long expiration = currentTimeMillis + 60 * 60 * 1000;  // expires after 60 minutes
+        Date expirationDate = new Date(expiration);
+        token.setExpiration(expirationDate);
 
-        }else{
-            Long expiration = currentTimeMillis + 60 * 60 * 1000;  // expires after 1 hours (business account)
-            Date expirationDate = new Date(expiration);
-            token.setExpiration(expirationDate);
-        }
         JedisData.loadToJedis(token, token.getUuid());
         return tokenString;
 
