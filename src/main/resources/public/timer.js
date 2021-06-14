@@ -7,9 +7,9 @@
     let stepsTaken = [];
     let starttime;
     let previousStepTime;
-    let customer = JSON.parse(localStorage.getItem("customer"));
     let startandstopbutton;
     let counterbutton;
+    let email="";
 
 
     $(document).ready(function(){
@@ -21,6 +21,7 @@
             window.location="/"; //there is no login token on the url, so they must not have logged in yet, we will help redirect them here
         } else {
             usertoken = hashparts[1];// the url should look like https://stedi.me/timer.html#4c2286a7-8fdc-47c5-b972-739769554c88
+            validateToken();//check if token is expired, if not display the email, if expired send to login
         }
     });
 
@@ -32,7 +33,7 @@
 
 
 
-    let saveRapidStepTest = (rapidStepTest) => {
+    const saveRapidStepTest = (rapidStepTest) => {
         $.ajax({
             type: 'POST',
             url: '/rapidsteptest',
@@ -40,22 +41,22 @@
             statusCode:{
                 401: () => window.location.href="/",
             },
-            headers: { "suresteps.session.token": localStorage.getItem("token")},
+            headers: { "suresteps.session.token": usertoken},
             contentType: "application/text",
             dataType: 'text'
         });
 
     }
 
-    let getRiskScore = () => {
+    const getRiskScore = () => {
         $.ajax({
             type: 'GET',
-            url: '/riskscore/'+customer.email,
+            url: '/riskscore/'+$('#email').html(),
             success: function(data) {
                 let customerRisk = JSON.parse(data);
                 document.getElementById('score').innerHTML = customerRisk.score;
             },
-            headers: { "suresteps.session.token": localStorage.getItem("token")},
+            headers: { "suresteps.session.token": usertoken},
             contentType: "application/text",
             dataType: 'text'
         });
@@ -63,7 +64,7 @@
     }
 
 
-    let updateStepCount = (webSocketPayload) => {
+    const updateStepCount = (webSocketPayload) => {
         if(webSocketPayload.data=="startTimer"){
             startandstop();
         } else if (webSocketPayload.data.indexOf("stepCount")>-1 && runningstate ==1){
@@ -71,7 +72,25 @@
         }
     }
 
-    function onStep() {
+    const validateToken = () => {
+        let tokenEmail="";
+        $.ajax({
+           type: 'GET',
+            url: '/validate/'+usertoken,
+            success: function(data){
+               if (data==""){
+                 window.location="/"
+               } else{
+                 $('#email').html(data);
+               }
+            },//token is no longer valid (1 hour expiration), they need to log in
+            contentType: "application/text",
+            dataType: 'text' })
+
+        return tokenEmail;
+    }
+
+    const onStep = () => {
         let stepDate = new Date();
         let stepTime = stepDate.getTime();
         if (previousStepTime==null){
@@ -86,13 +105,13 @@
         	startandstop();
         	let testTime = stepTime-starttime;
             let rapidStepTest = {
-               token: localStorage.getItem("token"),
+               token: usertoken,
                startTime: starttime,
                stopTime: stepTime,
                testTime: testTime,
                totalSteps: 30,
                stepPoints: stepsTaken,
-               customer: customer
+               customer: $('#email').html()
             };
             saveRapidStepTest(rapidStepTest);
             getRiskScore();
@@ -104,7 +123,7 @@
 
 	 };
 
-    let timecounter = (starttime) => {
+    const timecounter = (starttime) => {
         currentdate = new Date();
                 stopwatch = document.getElementById('stopwatch');
          
@@ -126,7 +145,7 @@
     }
  
 
-    function startandstop() {
+    const startandstop = () => {
       if(runningstate==0)
       {
         startdate = new Date();
@@ -143,14 +162,14 @@
       }
     }
 
-    let pageStateStopped = () => {
+    const pageStateStopped = () => {
         startandstop.value = 'Start';
         startandstop.disabled=false;
         counterbutton.disabled=true;
         runningstate = 0;
     }
 
-    function resetstopwatch() {
+    const resetstopwatch = () => {
         stoptime = 0;
         window.clearTimeout(refresh);
       
@@ -168,7 +187,7 @@
         }
     }
 
-    let formattedtime = (unformattedtime) => {
+    const formattedtime = (unformattedtime) => {
         let decisec = Math.floor(unformattedtime/100) + '';
         let second = Math.floor(unformattedtime/1000);
         let minute = Math.floor(unformattedtime/60000);

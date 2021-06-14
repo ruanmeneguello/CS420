@@ -17,7 +17,7 @@ public class RapidStepTest implements Comparable<RapidStepTest>{
     private Long testTime;
     private Integer totalSteps;
     private Integer feelingScore;
-    private Customer customer;
+    private String customer;
 
     @Override
     public int compareTo(RapidStepTest rapidStepTest){
@@ -52,9 +52,6 @@ public class RapidStepTest implements Comparable<RapidStepTest>{
         return stepPoints;
     }
 
-    public void setStepPoints(ArrayList stepPoints) {
-        this.stepPoints = stepPoints;
-    }
 
     public Long getStopTime() {
         return stopTime;
@@ -104,11 +101,15 @@ public class RapidStepTest implements Comparable<RapidStepTest>{
         this.customerBirthDate = customerBirthDate;
     }
 
-    public Customer getCustomer() {
+    public void setStepPoints(ArrayList<Long> stepPoints) {
+        this.stepPoints = stepPoints;
+    }
+
+    public String getCustomer() {
         return customer;
     }
 
-    public void setCustomer(Customer customer) {
+    public void setCustomer(String customer) {
         this.customer = customer;
     }
 }

@@ -30,13 +30,13 @@ function savetoken(token){
 
 }
 
-function checkexpiredtoken(){
+function checkexpiredtoken(token){
 // read token from local storage - check with ajax call
     if(window.localStorage){
     usertoken = localStorage.getItem("token");
     $.ajax({
        type: 'GET',
-        url: '/checkToken',
+        url: '/validate/'+token,
         data: JSON.stringify({usertoken}),
         success: function(data){savetoken(data)},
         contentType: "application/text",

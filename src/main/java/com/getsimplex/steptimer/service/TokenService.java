@@ -63,11 +63,6 @@ public class TokenService {
     public static Boolean isExpired(String tokenString) throws Exception{
         Optional<LoginToken> matchingToken=JedisData.getEntityById(LoginToken.class, tokenString);
 
-        Boolean expired = false;
-        if (matchingToken.isPresent() && matchingToken.get().getExpires() && matchingToken.get().getExpiration().before(new Date())){
-            expired = true;
-        }
-
-        return expired;
+        return matchingToken.isPresent() && matchingToken.get().getExpires() && matchingToken.get().getExpiration().before(new Date());
     }
 }

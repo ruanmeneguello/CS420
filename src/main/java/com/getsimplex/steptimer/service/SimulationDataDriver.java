@@ -86,7 +86,7 @@ public class SimulationDataDriver {
                  mostRecentTestTime.put(testCustomer.getCustomerName(), testTime);
 
                  RapidStepTest rapidStepTest = new RapidStepTest();
-                 rapidStepTest.setCustomer(testCustomer);
+                 rapidStepTest.setCustomer(testCustomer.getEmail());
                  rapidStepTest.setStopTime(System.currentTimeMillis());
                  rapidStepTest.setStartTime(rapidStepTest.getStopTime() - testTime);
                  rapidStepTest.setTestTime(testTime);

@@ -49,6 +49,16 @@ public class SessionValidator {
         return TokenService.isExpired(tokenString);
     }
 
+    public static String emailFromToken(String tokenString) throws Exception{
+        String customerEmail="";
+        if  (!TokenService.isExpired(tokenString))
+        {
+            customerEmail=TokenService.getUserFromToken(tokenString).get().getEmail();
+        }
+
+        return customerEmail;
+
+    }
 
 
 }
