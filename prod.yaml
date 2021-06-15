@@ -19,8 +19,8 @@ spec:
             - name: REDIS_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: redis
-                  key: password
+                  name: redis-secrets-prod
+                  key: REDIS_PASS
             - name: REDIS_HOST
               value: "redis-stedi-prod"
             - name: REDIS_PORT
