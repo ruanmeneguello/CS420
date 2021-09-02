@@ -29,7 +29,20 @@ public class WebAppRunner {
         //post("/sensorUpdates", (req, res)-> WebServiceHandler.routeDeviceRequest(req));
         //post("/generateHistoricalGraph", (req, res)->routePdfRequest(req, res));
         //get("/readPdf", (req, res)->routePdfRequest(req, res));
-        post("/user", (req, res)-> callUserDatabase(req));
+        post("/user", (req, res)-> {
+            String response="Error creating user";
+            try {
+                response = callUserDatabase(req);
+            } catch (AlreadyExistsException ae){
+                res.status(409);
+                System.out.println("User already exists");
+            } catch (Exception e){
+                res.status(500);
+                System.out.println("Error creating user");
+            }
+            return response;
+        }
+            );
         get("/validate/:token", (req,res)->SessionValidator.emailFromToken(req.params(":token")));
         get("/simulation", (req, res) -> SimulationDataDriver.getSimulationActive());
         post("/simulation", (req, res)-> MessageIntake.route(new StartSimulation(30)));
@@ -44,15 +57,24 @@ public class WebAppRunner {
             return StepHistory.getAllTests(req.params(":customer"));
         });
         post("/customer", (req, res)-> {
-            String newLocation;
+            String response;
             try {
                 createNewCustomer(req, res);
-                newLocation="/";
-            } catch (Exception e){
-                System.out.println("*** Error Creating Customer: "+e.getMessage());
-                newLocation="/";
+                response="Successfully created customer";
             }
-            return newLocation;
+
+            catch (AlreadyExistsException ae){
+                System.out.println("User already exists");
+                res.status(409);
+                response="Error creating customer";
+            }
+
+            catch (Exception e){
+                System.out.println("*** Error Creating Customer: "+e.getMessage());
+                res.status(500);
+                response="Error creating customer";
+            }
+            return response;
         });
         get("/customer/:customer", (req, res)-> {
             try {

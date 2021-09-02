@@ -45,9 +45,10 @@ public class CreateNewUser {
 
             List<User> existingUsers = JedisData.getEntitiesByScore(User.class,  Long.valueOf(standardizedPhoneDigitsOnly), Long.valueOf(standardizedPhoneDigitsOnly));
 
-            if (existingUsers.size()>0) {
+            Optional<User> existingUser = JedisData.getEntityById(User.class, createUser.getEmail());
+            if (existingUsers.size()>0 || existingUser.isPresent()) {
 
-                throw new Exception("Username already exists");
+                throw new AlreadyExistsException("Username already exists");
 
             } else {
                 addUser.setUserName(userName);
