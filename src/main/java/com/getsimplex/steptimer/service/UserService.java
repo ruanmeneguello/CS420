@@ -13,10 +13,9 @@ import java.util.function.Predicate;
  */
 public class UserService {
 
-    public static User getUser(String userName) throws Exception{
-        Predicate<User> userPredicate = user -> user.getUserName().equals(userName);
-        List<User> users =getUsers();
-        Optional<User> userOptional = users.stream().filter(userPredicate).findFirst();
+    public static User getUserByUserName(String userName) throws Exception{
+
+        Optional<User> userOptional = JedisData.getEntityById(User.class, userName);
         if (!userOptional.isPresent()){
             throw new Exception ("User name not found");
         }
@@ -25,8 +24,18 @@ public class UserService {
 
     }
 
-    public static List<User> getUsers() throws Exception{
-        ArrayList<User> users = JedisData.getEntityList(User.class);
-        return users;
+    public static User getUserByPhone(Long phoneNumber) throws Exception{
+
+        List<User> users = JedisData.getEntitiesByScore(User.class, phoneNumber, phoneNumber);
+        if (users.isEmpty()){
+            throw new Exception ("Phone number "+phoneNumber+" not found");
+        }
+        if (users.size()>1){
+            throw new Exception ("Multiple users found with same phone number: "+phoneNumber);
+        }
+        return users.get(0);
+
     }
+
+
 }

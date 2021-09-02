@@ -5,8 +5,6 @@ import com.getsimplex.steptimer.model.User;
 import com.getsimplex.steptimer.utils.JedisData;
 
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.getsimplex.steptimer.utils.JedisData.deleteFromRedis;
 
@@ -37,7 +35,7 @@ public class TokenService {
         Optional<LoginToken> tokenOptional = lookupToken(userToken);
         if (tokenOptional.isPresent()){
             LoginToken loginToken = tokenOptional.get();
-            foundUser = Optional.of(UserService.getUser(loginToken.getUser()));
+            foundUser = Optional.of(UserService.getUserByUserName(loginToken.getUser()));
         }
         return foundUser;
     }

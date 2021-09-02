@@ -2,15 +2,11 @@ package com.getsimplex.steptimer.service;
 
 import com.google.gson.Gson;
 import com.getsimplex.steptimer.model.LoginRequest;
-import com.getsimplex.steptimer.model.LoginToken;
 import com.getsimplex.steptimer.model.User;
-import com.getsimplex.steptimer.utils.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import spark.Request;
 import com.getsimplex.steptimer.utils.JedisClient;
-import com.getsimplex.steptimer.utils.JedisData;
-import java.util.*;
-import java.util.function.Predicate;
+
 import java.util.logging.Logger;
 
 import static com.getsimplex.steptimer.service.TokenService.*;
@@ -46,7 +42,7 @@ public class LoginController {
     public static Boolean isValidPassword(String unauthenticatedName, String attemptedPwValue)throws Exception {
         boolean passwordIsValid = false;
         boolean userNameIsValid=false;
-        User currentUser = UserService.getUser(unauthenticatedName);
+        User currentUser = UserService.getUserByUserName(unauthenticatedName);
 
         //use if logging in with Redis
         try {

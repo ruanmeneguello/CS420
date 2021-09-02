@@ -12,6 +12,7 @@ import spark.Response;
 import spark.Spark;
 
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static spark.Spark.*;
 
@@ -66,6 +67,7 @@ public class WebAppRunner {
         });
 
         post("/login", (req, res)->loginUser(req));
+        post("/twofactorlogin/:phoneNumber",(req, res) -> twoFactorLogin(req, res));
         post("/rapidsteptest", (req, res)->{
             try{
                 userFilter(req, res);
@@ -89,6 +91,33 @@ public class WebAppRunner {
 
 
         init();
+    }
+    private static String twoFactorLogin(Request request, Response response){
+        String phoneNumber =  request.params(":phoneNumber");
+        int randomNum = ThreadLocalRandom.current().nextInt(1111, 10000);
+        User user=null;
+        try {
+            phoneNumber = SendText.getFormattedPhone(phoneNumber);
+            user = UserService.getUserByUserName(phoneNumber);
+            if (user!=null){
+                SendText.send(phoneNumber, "STEDI OTP: "+String.valueOf(randomNum));
+                response.status(200);
+
+            } else{
+                response.status(400);
+                System.out.println("Unable to find user with phone number: "+phoneNumber);
+
+            }
+        } catch (Exception e){
+            response.status(500);
+            System.out.println("Error while looking up user "+phoneNumber+" "+e.getMessage());
+        }
+
+        if (user==null){
+            return "Unable to find user with phone number: "+phoneNumber;
+        } else{
+            return "Ok";
+        }
     }
 
     private static void userFilter(Request request, Response response) throws Exception{
