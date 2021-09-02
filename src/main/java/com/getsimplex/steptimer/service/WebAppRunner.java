@@ -98,7 +98,7 @@ public class WebAppRunner {
         User user=null;
         try {
             phoneNumber = SendText.getFormattedPhone(phoneNumber);
-            user = UserService.getUserByUserName(phoneNumber);
+            user = UserService.getUserByPhone(phoneNumber);
             if (user!=null){
                 SendText.send(phoneNumber, "STEDI OTP: "+String.valueOf(randomNum));
                 response.status(200);

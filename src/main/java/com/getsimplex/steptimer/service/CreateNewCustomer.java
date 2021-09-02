@@ -3,6 +3,7 @@ package com.getsimplex.steptimer.service;
 import com.getsimplex.steptimer.model.Customer;
 import com.getsimplex.steptimer.utils.JedisClient;
 import com.getsimplex.steptimer.utils.JedisData;
+import com.getsimplex.steptimer.utils.SendText;
 import com.google.gson.Gson;
 import spark.Request;
 
@@ -30,9 +31,12 @@ public class CreateNewCustomer {
     public static String createCustomer(Customer newCustomer) throws Exception{
 //        List<Customer> customers = JedisData.getEntityList(Customer.class);
 //        Predicate<Customer> findExistingCustomerPredicate = customer -> customer.getEmail().equals(newCustomer.getEmail());
-        Optional<Customer> matchingCustomer = JedisData.getEntityById(Customer.class, newCustomer.getEmail());
+        String phone = SendText.getFormattedPhone(newCustomer.getPhone());//ex: 801-719-0908 becomes: +18017190908
+        newCustomer.setPhone(phone);
+        String numericDigitsOnly = phone.replaceAll("[^0-9]","");
+        ArrayList<Customer> matchingCustomers = JedisData.getEntitiesByScore(Customer.class, Long.valueOf(numericDigitsOnly), Long.valueOf(numericDigitsOnly));
 
-        if (matchingCustomer.isPresent()){
+        if (matchingCustomers.size()>0){
             throw new Exception("Customer already exists");
         }
 

@@ -35,16 +35,17 @@ public class CreateNewUser {
         String password = createUser.getPassword();
         String verifyPassword = createUser.getVerifyPassword();
         String email = createUser.getEmail();
-        String phone = createUser.getPhone();
+        String phone = SendText.getFormattedPhone(createUser.getPhone());
+        String standardizedPhoneDigitsOnly= phone.replaceAll("[^0-9]","");
         String bday = createUser.getBirthDate();
         String deviceId = createUser.getDeviceNickName();
 
 
         if (userName != null && !userName.isEmpty()) {
 
-            Optional<User> existingUser = JedisData.getEntityById(User.class,  createUser.getUserName());
+            List<User> existingUsers = JedisData.getEntitiesByScore(User.class,  Long.valueOf(standardizedPhoneDigitsOnly), Long.valueOf(standardizedPhoneDigitsOnly));
 
-            if (existingUser.isPresent()) {
+            if (existingUsers.size()>0) {
 
                 throw new Exception("Username already exists");
 
@@ -83,8 +84,9 @@ public class CreateNewUser {
         }
 
 
+
         //SAVE USER TO REDIS
-        JedisData.loadToJedis(addUser, addUser.getUserName(), Long.valueOf(addUser.getPhone()));
+        JedisData.loadToJedis(addUser, addUser.getUserName(), Long.valueOf(standardizedPhoneDigitsOnly));
 
         return "Welcome: " + addUser.getUserName() + " Your account has been created, please login.";
 
