@@ -91,6 +91,22 @@ public class WebAppRunner {
 
         post("/login", (req, res)->loginUser(req));
         post("/twofactorlogin/:phoneNumber",(req, res) -> twoFactorLogin(req, res));
+        post("/twofactorlogin", (req, res) ->{
+            String response = "";
+           try{
+               response=OneTimePasswordService.handleRequest(req);
+           } catch (NotFoundException nfe){
+               res.status(404);
+               response= nfe.getMessage();
+           } catch (ExpiredException ee){
+               res.status(401);
+               response= ee.getMessage();
+           } catch (Exception e){
+                res.status(500);
+                response = "Unexpected error";
+           }
+            return response;
+        });
         post("/rapidsteptest", (req, res)->{
             try{
                 userFilter(req, res);
@@ -123,12 +139,13 @@ public class WebAppRunner {
             phoneNumber = SendText.getFormattedPhone(phoneNumber);
             user = UserService.getUserByPhone(phoneNumber);
             if (user!=null){
-                String loginToken=TokenService.createUserToken(user.getUserName());
+                Long expiration = new Date().getTime()+100l * 365l * 24l *60l * 60l *1000l;//100 years
+                String loginToken=TokenService.createUserTokenSpecificTimeout(user.getUserName(), expiration);
                 OneTimePassword oneTimePassword = new OneTimePassword();
                 oneTimePassword.setOneTimePassword(randomNum);
-                oneTimePassword.setExpirationDate(new Date(System.currentTimeMillis()+60l*30l));
+                oneTimePassword.setExpirationDate(new Date(System.currentTimeMillis()+60l*30l*1000l));
                 oneTimePassword.setLoginToken(loginToken);
-
+                oneTimePassword.setPhoneNumber(phoneNumber);
                 OneTimePasswordService.saveOneTimePassword(oneTimePassword);
 
                 SendText.send(phoneNumber, "STEDI OTP: "+String.valueOf(randomNum));

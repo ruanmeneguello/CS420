@@ -44,18 +44,28 @@ public class TokenService {
 
         String tokenString = UUID.randomUUID().toString();
         Long currentTimeMillis = System.currentTimeMillis();
+
+
+        Long expiration = currentTimeMillis + 60 * 60 * 1000;  // expires after 60 minutes
+
+        return createUserTokenSpecificTimeout(userName, expiration);
+
+    }
+
+    public static String createUserTokenSpecificTimeout(String userName, Long timeout) throws Exception{
+        String tokenString = UUID.randomUUID().toString();
+        Long currentTimeMillis = System.currentTimeMillis();
         LoginToken token = new LoginToken();
         token.setExpires(true);
         token.setUuid(tokenString);
         token.setUser(userName);
 
         Long expiration = currentTimeMillis + 60 * 60 * 1000;  // expires after 60 minutes
-        Date expirationDate = new Date(expiration);
+        Date expirationDate = new Date(timeout);
         token.setExpiration(expirationDate);
 
         JedisData.loadToJedis(token, token.getUuid());
         return tokenString;
-
     }
 
     public static Boolean isExpired(String tokenString) throws Exception{

@@ -7,6 +7,7 @@ public class OneTimePassword {
     private Date expirationDate;
     private Integer oneTimePassword;
     private String loginToken;
+    private String phoneNumber;
 
     public Date getExpirationDate() {
         return expirationDate;
@@ -30,5 +31,13 @@ public class OneTimePassword {
 
     public void setLoginToken(String loginToken) {
         this.loginToken = loginToken;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
