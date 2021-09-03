@@ -11,6 +11,7 @@ import spark.Request;
 import spark.Response;
 import spark.Spark;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -122,6 +123,14 @@ public class WebAppRunner {
             phoneNumber = SendText.getFormattedPhone(phoneNumber);
             user = UserService.getUserByPhone(phoneNumber);
             if (user!=null){
+                String loginToken=TokenService.createUserToken(user.getUserName());
+                OneTimePassword oneTimePassword = new OneTimePassword();
+                oneTimePassword.setOneTimePassword(randomNum);
+                oneTimePassword.setExpirationDate(new Date(System.currentTimeMillis()+60l*30l));
+                oneTimePassword.setLoginToken(loginToken);
+
+                OneTimePasswordService.saveOneTimePassword(oneTimePassword);
+
                 SendText.send(phoneNumber, "STEDI OTP: "+String.valueOf(randomNum));
                 response.status(200);
 
