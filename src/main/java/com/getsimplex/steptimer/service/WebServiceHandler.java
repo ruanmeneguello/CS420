@@ -10,7 +10,7 @@ import java.io.*;
 import java.util.Date;
 
 /**
- * Created by sean on 9/15/2016.
+ * //© 2021 Sean Murdock, Created by sean on 9/15/2016.
  */
 public class WebServiceHandler {
     private static Gson gson = new Gson();

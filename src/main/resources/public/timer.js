@@ -1,3 +1,5 @@
+//© 2021 Sean Murdock
+
     let clicks = 0;
     let stopwatch;
     let runningstate = 0; // 1 means the timecounter is running 0 means counter stopped

@@ -1,3 +1,5 @@
+//© 2021 Sean Murdock
+
 package com.getsimplex.steptimer.utils;
 
 import com.google.gson.Gson;

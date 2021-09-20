@@ -1,3 +1,5 @@
+#© 2021 Sean Murdock
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -1,3 +1,5 @@
+//© 2021 Sean Murdock
+
 let userName = "";
 let password = "";
 let verifypassword = "";

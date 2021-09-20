@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Created by Sean on 9/1/2015.
+ * © 2021 Sean Murdock, Created by Sean on 9/1/2015.
 
  *  The basic idea is we want to be able to retrieve ALL of something (ex: all steps for all customers)
  *  AND we want to be able to retrieve something specific (ex: customer with email: sam@gmail.com

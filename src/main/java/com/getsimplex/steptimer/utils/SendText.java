@@ -1,3 +1,5 @@
+//© 2021 Sean Murdock
+
 package com.getsimplex.steptimer.utils;
 
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
