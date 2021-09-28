@@ -99,7 +99,7 @@ public class JedisData {
     }
 
 
-    public static synchronized <T> void update(T object, String key){
+    public static synchronized <T> void update(T object, String key) throws Exception{
         JedisClient.hmset(object.getClass().getSimpleName()+"Map", key, gson.toJson(object));
     }
 
