@@ -11,6 +11,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.beerboy.ss</groupId>
+            <artifactId>spark-swagger</artifactId>
+            <version>1.0.0.48</version>
+        </dependency>
+        <dependency>
             <groupId>com.googlecode.libphonenumber</groupId>
             <artifactId>libphonenumber</artifactId>
             <version>8.12.24</version>
@@ -73,6 +78,18 @@
 
 
     </dependencies>
+    <repositories>
+        <repository>
+            <id>manusant-beerRepo</id>
+            <url>https://packagecloud.io/manusant/beerRepo/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
     <build>
         <plugins>
             <plugin>
