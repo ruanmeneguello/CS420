@@ -9,6 +9,7 @@ package com.getsimplex.steptimer.service;
 import com.getsimplex.steptimer.model.*;
 import com.getsimplex.steptimer.utils.*;
 import spark.Request;
+import spark.Filter;
 import spark.Response;
 import spark.Spark;
 
@@ -23,9 +24,16 @@ public class WebAppRunner {
     public static void main(String[] args){
 
         Spark.port(getHerokuAssignedPort());
+        staticFileLocation("/public");
+        after((Filter) (request, response) -> {
+            response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, PATCH, OPTIONS");
+            response.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin,");
+            response.header("Access-Control-Allow-Credentials", "true");
+        });
 
 		//secure("/Applications/steptimerwebsocket/keystore.jks","password","/Applications/steptimerwebsocket/keystore.jks","password");
-        staticFileLocation("/public");
+
         webSocket("/socket", DeviceWebSocketHandler.class);
         webSocket("/timeruiwebsocket", TimerUIWebSocket.class);
         //post("/sensorUpdates", (req, res)-> WebServiceHandler.routeDeviceRequest(req));
