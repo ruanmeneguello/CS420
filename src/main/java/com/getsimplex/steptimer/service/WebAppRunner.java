@@ -8,6 +8,7 @@ package com.getsimplex.steptimer.service;
 
 import com.getsimplex.steptimer.model.*;
 import com.getsimplex.steptimer.utils.*;
+import spark.Filter;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
@@ -23,11 +24,18 @@ public class WebAppRunner {
     public static void main(String[] args){
 
         Spark.port(getHerokuAssignedPort());
-
-		//secure("/Applications/steptimerwebsocket/keystore.jks","password","/Applications/steptimerwebsocket/keystore.jks","password");
         staticFileLocation("/public");
         webSocket("/socket", DeviceWebSocketHandler.class);
         webSocket("/timeruiwebsocket", TimerUIWebSocket.class);
+
+        after((Filter) (request, response) -> {
+            response.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
+            response.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, PATCH, OPTIONS");
+            response.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin,");
+            response.header("Access-Control-Allow-Credentials", "true");
+        });
+		//secure("/Applications/steptimerwebsocket/keystore.jks","password","/Applications/steptimerwebsocket/keystore.jks","password");
+
         //post("/sensorUpdates", (req, res)-> WebServiceHandler.routeDeviceRequest(req));
         //post("/generateHistoricalGraph", (req, res)->routePdfRequest(req, res));
         //get("/readPdf", (req, res)->routePdfRequest(req, res));
@@ -129,7 +137,25 @@ public class WebAppRunner {
             return riskScore(req.params(":customer"));
         }));
 
+        options("/*",
+                (request, response) -> {
 
+                    String accessControlRequestHeaders = request
+                            .headers("Access-Control-Request-Headers");
+                    if (accessControlRequestHeaders != null) {
+                        response.header("Access-Control-Allow-Headers",
+                                accessControlRequestHeaders);
+                    }
+
+                    String accessControlRequestMethod = request
+                            .headers("Access-Control-Request-Method");
+                    if (accessControlRequestMethod != null) {
+                        response.header("Access-Control-Allow-Methods",
+                                accessControlRequestMethod);
+                    }
+
+                    return "OK";
+        });
         init();
     }
     private static String twoFactorLogin(Request request, Response response){
