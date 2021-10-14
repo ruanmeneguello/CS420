@@ -30,7 +30,7 @@ public class WebAppRunner {
         webSocket("/timeruiwebsocket", TimerUIWebSocket.class);
 
         after((Filter) (request, response) -> {
-            response.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
+            response.header("Access-Control-Allow-Origin", "*");
             response.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, PATCH, OPTIONS");
             response.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin,");
             response.header("Access-Control-Allow-Credentials", "true");
