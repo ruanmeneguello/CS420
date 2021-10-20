@@ -18,7 +18,7 @@ steps:
   - name: 'gcr.io/cloud-builders/gke-deploy'
     args:
       - run
-      - --filename=app.yaml
+      - --filename=prod.yaml
       - --image=gcr.io/$PROJECT_ID/stedi:latest
       - --location=us-east1-b
       - --cluster=cluster-1
