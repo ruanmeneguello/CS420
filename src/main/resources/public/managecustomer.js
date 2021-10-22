@@ -90,7 +90,7 @@ function createcustomer(){
         dataType: 'text',
         success: function(data) {
             localStorage.setItem("customer",JSON.stringify(customer));
-            window.location.href=data
+            window.location.href="/index.html"
         }
     });
 
