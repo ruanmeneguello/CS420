@@ -15,13 +15,14 @@ import spark.Response;
 import spark.Spark;
 
 import java.util.Date;
+import java.util.logging.Logger;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static spark.Spark.*;
 
 public class WebAppRunner {
-
+    private static Logger logger = Logger.getLogger(WebAppRunner.class.getName());
     public static void main(String[] args){
 
         Spark.port(getHerokuAssignedPort());
@@ -75,12 +76,15 @@ public class WebAppRunner {
             }
 
             catch (AlreadyExistsException ae){
+                logger.info("User already exists");
                 System.out.println("User already exists");
                 res.status(409);
+                logger.info("Error creating customer");
                 response="Error creating customer";
             }
 
             catch (Exception e){
+                logger.warning("*** Error Creating Customer: "+e.getMessage());
                 System.out.println("*** Error Creating Customer: "+e.getMessage());
                 res.status(500);
                 response="Error creating customer";
@@ -92,6 +96,7 @@ public class WebAppRunner {
                 userFilter(req, res);
             } catch (Exception e){
                 res.status(401);
+                logger.warning("*** Error Finding Customer: "+e.getMessage());
                 System.out.println("*** Error Finding Customer: "+e.getMessage());
                 return null;
             }
@@ -132,6 +137,7 @@ public class WebAppRunner {
                 userFilter(req, res);
             } catch (Exception e){
                 res.status(401);
+                logger.info("*** Error Finding Risk Score: "+e.getMessage());
                 System.out.println("*** Error Finding Risk Score: "+e.getMessage());
                 throw e;
             }
@@ -181,11 +187,13 @@ public class WebAppRunner {
 
             } else{
                 response.status(400);
+                logger.info("Unable to find user with phone number: "+phoneNumber);
                 System.out.println("Unable to find user with phone number: "+phoneNumber);
 
             }
         } catch (Exception e){
             response.status(500);
+            logger.info("Error while looking up user "+phoneNumber+" "+e.getMessage());
             System.out.println("Error while looking up user "+phoneNumber+" "+e.getMessage());
         }
 
@@ -209,10 +217,12 @@ public class WebAppRunner {
             }
 
             if (!user.isPresent()) { //Check to see if session expired
+                logger.info("Invalid user token: user not found using token: "+tokenString);
                 throw new Exception("Invalid user token: user not found using token: "+tokenString);
             }
 
             if (tokenExpired.equals(true)){
+                logger.info("Invalid user token: "+tokenString+" expired");
                 throw new Exception("Invalid user token: "+tokenString+" expired");
             }
 
