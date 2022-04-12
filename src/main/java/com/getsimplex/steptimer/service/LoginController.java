@@ -2,6 +2,7 @@
 
 package com.getsimplex.steptimer.service;
 
+import com.getsimplex.steptimer.utils.InvalidLoginException;
 import com.google.gson.Gson;
 import com.getsimplex.steptimer.model.LoginRequest;
 import com.getsimplex.steptimer.model.User;
@@ -35,7 +36,7 @@ public class LoginController {
                 String newToken = createUserToken(userName);
                 return newToken;
         }else{
-            throw new Exception("Invalid Login");
+            throw new InvalidLoginException("Invalid Login");
         }
     }
 

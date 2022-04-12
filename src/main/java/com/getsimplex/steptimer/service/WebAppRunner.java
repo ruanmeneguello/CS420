@@ -99,7 +99,7 @@ public class WebAppRunner {
 
         });
 
-        post("/login", (req, res)->loginUser(req));
+        post("/login", (req, res)->loginUser(req, res));
         post("/twofactorlogin/:phoneNumber",(req, res) -> twoFactorLogin(req, res));
         post("/twofactorlogin", (req, res) ->{
             String response = "";
@@ -228,8 +228,16 @@ public class WebAppRunner {
         return CreateNewUser.handleRequest(request);
     }
 
-    private static String loginUser(Request request) throws Exception{
-        return LoginController.handleRequest(request);
+    private static String loginUser(Request request, Response response) throws Exception{
+        String responseText="";
+
+        try{
+            responseText=LoginController.handleRequest(request);
+        } catch(InvalidLoginException ile){
+            response.status(401);
+        }
+
+        return responseText;
 
     }
 

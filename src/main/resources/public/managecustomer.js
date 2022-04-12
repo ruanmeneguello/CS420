@@ -91,7 +91,13 @@ function createcustomer(){
         success: function(data) {
             localStorage.setItem("customer",JSON.stringify(customer));
             window.location.href="/index.html"
-        }
+        },
+        error: function(xhr) {
+            console.log(JSON.stringify(xhr))
+            if(xhr.status==409){
+                alert("Email or cell # has already been previously registered");
+            }
+        },
     });
 
     $.ajax({

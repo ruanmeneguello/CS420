@@ -56,9 +56,29 @@ function userlogin(){
         success: function(data) {
             window.location.href = "/timer.html#"+data;//add the token to the url
         },
+        error: function(xhr){
+            alert('Invalid username or password was entered.')
+        },
         contentType: "application/text",
         dataType: 'text'
     });
+
+}
+
+function changePassword(){
+    $.ajax({
+        type: 'POST',
+        url: '/reset',
+        data: JSON.stringify({password, verifyPassword}),
+        success: function(data){
+            alert("Password successfully updated!");
+            window.location.href="/index.html"+
+        },
+        contentType: "application/text",
+        dataType:"text"
+
+
+    })
 
 }
 
@@ -98,6 +118,12 @@ function createuser(){
 //        readonlyforms("newUser");
 //        alert(readonlyforms("newUser"));
         window.location.href = "/index.html"},
+        error: function(xhr) {
+            console.log(JSON.stringify(xhr))
+            if(xhr.status==409){
+                alert("Email or cell # has already been registered");
+            }
+        },
         contentType: "application/text",
         dataType: 'text'
     });
