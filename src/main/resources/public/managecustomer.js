@@ -103,7 +103,7 @@ function createcustomer(){
     $.ajax({
         type: 'POST',
         url: '/user',
-        data: JSON.stringify({'userName':email, email, password, phone, "birthDate":bday, 'verifyPassword':verifypassword}),//we are using the email as the user name
+        data: JSON.stringify({'userName':email, email, password, phone, "birthDate":bday, verifyPassword}),//we are using the email as the user name
         success: function(data) { alert(data);
         window.location.href = "/index.html"},
         contentType: "application/text",
