@@ -8,6 +8,7 @@ package com.getsimplex.steptimer.service;
 
 import com.getsimplex.steptimer.model.*;
 import com.getsimplex.steptimer.utils.*;
+import com.google.gson.Gson;
 import spark.Filter;
 import spark.Request;
 import spark.Filter;
@@ -19,6 +20,7 @@ import java.util.logging.Logger;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
+import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 import static spark.Spark.*;
 
 public class WebAppRunner {
@@ -59,7 +61,17 @@ public class WebAppRunner {
         get("/simulation", (req, res) -> SimulationDataDriver.getSimulationActive());
         post("/simulation", (req, res)-> MessageIntake.route(new StartSimulation(30)));
         delete("/simulation", (req, res)-> MessageIntake.route(new StopSimulation()));
+        post("/complexity", (req,res)->{
+            Gson gson = new Gson();
+            Boolean validPassword = CreateNewUser.validatePassword(gson.fromJson(req.body(), User.class).getPassword());
 
+            if (validPassword){
+                res.status(200);
+            } else{
+                res.status(400);
+            }
+            return validPassword;
+        });
         get ("/stephistory/:customer", (req, res)-> {
             try{
                 userFilter(req, res);
@@ -247,7 +259,9 @@ public class WebAppRunner {
         String responseText="";
 
         try{
-            responseText=LoginController.handleRequest(request);
+
+            String token = responseText=LoginController.handleRequest(request);
+            response.cookie("stedi-token",token);
         } catch(InvalidLoginException ile){
             response.status(401);
         }
