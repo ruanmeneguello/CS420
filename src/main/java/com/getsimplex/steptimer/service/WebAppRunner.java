@@ -108,6 +108,11 @@ public class WebAppRunner {
             }
             return response;
         });
+        post("/contact", (req, res)->{
+            System.out.println(req.body());
+            res.status(200);
+            return "sent";
+        });
         get("/customer/:customer", (req, res)-> {
             try {
                 userFilter(req, res);
