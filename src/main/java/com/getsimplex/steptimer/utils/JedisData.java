@@ -139,6 +139,26 @@ public class JedisData {
 
     }
 
+    public static void deleteJedis(Class clazz, String id) throws Exception{
+        try {
+            JedisClient.hdel(clazz.getSimpleName()+"Map", id);
+            JedisClient.zrem(clazz.getSimpleName(), id);
+        } catch (Exception e) {
+
+            throw (e);
+        }
+    }
+
+    public static void deleteJedisByScore(Class clazz, String id, long score) throws Exception{
+        try {
+            JedisClient.hdel(clazz.getSimpleName()+"Map", id);
+            JedisClient.zremrangeByScore(clazz.getSimpleName(), score, score);
+        } catch (Exception e) {
+
+            throw (e);
+        }
+    }
+
     public static <T> void loadToJedisWithIndex(T record, String id, long score, String indexName, String index) throws Exception{
 
         try {

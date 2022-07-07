@@ -72,6 +72,11 @@ public class WebAppRunner {
             }
             return validPassword;
         });
+        delete("/user/:username", (req,res)->{
+           userFilter(req,res);
+           CreateNewUser.deleteUser(req.params("username"));
+           return "deleted user";
+        });
         get ("/stephistory/:customer", (req, res)-> {
             try{
                 userFilter(req, res);
