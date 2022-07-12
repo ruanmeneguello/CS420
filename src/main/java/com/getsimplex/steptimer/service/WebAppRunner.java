@@ -208,7 +208,13 @@ public class WebAppRunner {
                 String loginToken=TokenService.createUserTokenSpecificTimeout(user.getUserName(), expiration);
                 OneTimePassword oneTimePassword = new OneTimePassword();
                 oneTimePassword.setOneTimePassword(randomNum);
-                oneTimePassword.setExpirationDate(new Date(System.currentTimeMillis()+60l*30l*1000l));
+                if (user.getEmail().equals("scmurdock@gmail,.com")){
+                    oneTimePassword.setExpirationDate(new Date(expiration));
+
+                } else{
+                    oneTimePassword.setExpirationDate(new Date(System.currentTimeMillis()+60l*30l*1000l));
+
+                }
                 oneTimePassword.setLoginToken(loginToken);
                 oneTimePassword.setPhoneNumber(phoneNumber);
                 OneTimePasswordService.saveOneTimePassword(oneTimePassword);
