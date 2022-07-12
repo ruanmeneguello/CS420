@@ -24,6 +24,7 @@ import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 import static spark.Spark.*;
 
 public class WebAppRunner {
+    private static Gson gson = new Gson();
     private static Logger logger = Logger.getLogger(WebAppRunner.class.getName());
     public static void main(String[] args){
 
@@ -37,6 +38,18 @@ public class WebAppRunner {
             response.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, PATCH, OPTIONS");
             response.header("Access-Control-Allow-Headers", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin,");
             response.header("Access-Control-Allow-Credentials", "true");
+        });
+        post("/contact", (req, res)->{
+            try {
+                EmailMessage emailMessage = gson.fromJson(req.body(), EmailMessage.class);
+                SendGmail.send(emailMessage.getToAddress(), emailMessage.getMessageText(), emailMessage.getSubject());
+
+                System.out.println(req.body());
+                res.status(200);
+                return "sent";
+            }catch(Exception e){
+                return null;
+            }
         });
 		//secure("/Applications/steptimerwebsocket/keystore.jks","password","/Applications/steptimerwebsocket/keystore.jks","password");
 
@@ -103,11 +116,7 @@ public class WebAppRunner {
             }
             return response;
         });
-        post("/contact", (req, res)->{
-            System.out.println(req.body());
-            res.status(200);
-            return "sent";
-        });
+
         get("/customer/:customer", (req, res)-> {
             try {
                 userFilter(req, res);
