@@ -42,14 +42,15 @@ public class WebAppRunner {
         post("/contact", (req, res)->{
             try {
                 EmailMessage emailMessage = gson.fromJson(req.body(), EmailMessage.class);
-                SendGmail.send(emailMessage.getToAddress(), emailMessage.getMessageText(), emailMessage.getSubject());
+                SendGmail.send(emailMessage.getToAddress(), emailMessage.getMessageText(), emailMessage.getSubject(), emailMessage.getName());
 
                 System.out.println(req.body());
                 res.status(200);
-                return "sent";
+
             }catch(Exception e){
                 return null;
             }
+            return "sent";
         });
 		//secure("/Applications/steptimerwebsocket/keystore.jks","password","/Applications/steptimerwebsocket/keystore.jks","password");
 

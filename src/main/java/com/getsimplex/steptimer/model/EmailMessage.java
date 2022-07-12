@@ -5,6 +5,8 @@ public class EmailMessage {
     private String toAddress;
     private String subject;
 
+    private String name;
+
 
     public String getMessageText() {
         return messageText;
@@ -31,7 +33,10 @@ public class EmailMessage {
     public void setSubject(String subject) {
         this.subject = subject;
     }
-
-
-
+     public String getName(){
+        return name;
+     }
+    public void setName(String name) {
+        this.name = name;
+    }
 }

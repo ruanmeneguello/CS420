@@ -5,7 +5,7 @@ import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
 public class SendGmail {
-    public static void send(String toAddress, String messageText, String subject) {
+    public static void send(String toAddress, String messageText, String subject, String name) {
         final String username = "sean@stedi.me";
         final String password = "Itsnot@boutme";
 
