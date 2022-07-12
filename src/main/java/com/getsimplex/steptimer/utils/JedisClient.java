@@ -230,6 +230,18 @@ public class JedisClient {
         }
     }
 
+    public static synchronized void hdel (String mapName, String key) throws Exception{
+        Jedis jedis = jedisPool.getResource();
+        try{
+            jedis.hdel(mapName, key);
+            jedisPool.returnResource(jedis);
+
+        } catch (Exception e){
+            jedisPool.returnBrokenResource(jedis);
+            throw new Exception("Tried setting: "+mapName+" key : "+key+" without success");
+        }
+    }
+
     public static synchronized Optional<String> hmget (String mapName, String key) throws Exception {
         Jedis jedis = jedisPool.getResource();
         try {
