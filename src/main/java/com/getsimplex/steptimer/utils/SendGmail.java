@@ -24,7 +24,8 @@ public class SendGmail {
         try {
 
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("info@stedi.me"));
+            InternetAddress fromAddress = new InternetAddress ("info@stedi.me", name);
+            message.setFrom(fromAddress);
             message.setRecipients(
                     Message.RecipientType.TO,
                     InternetAddress.parse(toAddress)
@@ -35,7 +36,7 @@ public class SendGmail {
             Transport.send(message);
 
             System.out.println("Done");
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
