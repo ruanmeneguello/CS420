@@ -30,6 +30,8 @@ public class SendGmail {
                     Message.RecipientType.TO,
                     InternetAddress.parse(toAddress)
             );
+            Address ccAddress =  new InternetAddress("info@stedi.me");
+            message.addRecipient(Message.RecipientType.CC, ccAddress);
             message.setSubject(subject);
             message.setText(messageText);
 //            message.setFrom(fromAddress);
