@@ -166,14 +166,18 @@ public class WebAppRunner {
         });
         get("/riskscore/:customer",((req,res) -> {
             try{
-                userFilter(req, res);
+                Optional<User> user = userFilter(req, res);
+               String customer = req.params(":customer");
+                if (user.isPresent() && user.get().getEmail().equals(customer)) {
+                    return riskScore(req.params(":customer"));
+                }
             } catch (Exception e){
                 res.status(401);
                 logger.info("*** Error Finding Risk Score: "+e.getMessage());
                 System.out.println("*** Error Finding Risk Score: "+e.getMessage());
                 throw e;
             }
-            return riskScore(req.params(":customer"));
+           return null;
         }));
 
         options("/*",
@@ -242,7 +246,7 @@ public class WebAppRunner {
         }
     }
 
-    private static void userFilter(Request request, Response response) throws Exception{
+    private static Optional<User> userFilter(Request request, Response response) throws Exception{
         String tokenString = request.headers("suresteps.session.token");
 
             Optional<User> user = TokenService.getUserFromToken(tokenString);//
@@ -251,7 +255,7 @@ public class WebAppRunner {
 
             if (user.isPresent() && tokenExpired && !user.get().isLocked()){//if a user is locked, we won't renew tokens until they are unlocked
                 TokenService.renewToken(tokenString);
-                return;
+                return user;
             }
 
             if (!user.isPresent()) { //Check to see if session expired
@@ -263,8 +267,9 @@ public class WebAppRunner {
                 logger.info("Invalid user token: "+tokenString+" expired");
                 throw new Exception("Invalid user token: "+tokenString+" expired");
             }
-
+        return user;
     }
+
 
 
 
