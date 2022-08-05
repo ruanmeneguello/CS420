@@ -58,13 +58,13 @@ public class StepHistory {
         //positive means they have improved
         //negative means they have declined
 
-        Integer birthYear = Integer.valueOf(customer.get().getBirthDay().split("-")[0]);
+//        Integer birthYear = Integer.valueOf(customer.get().getBirthDay().split("-")[0]);
 
         CustomerRisk customerRisk = new CustomerRisk();
         customerRisk.setScore(new Float(riskScore.setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
         customerRisk.setCustomer(email);
         customerRisk.setRiskDate(new Date(mostRecentTest.getStopTime()));
-        customerRisk.setBirthYear(birthYear);
+//        customerRisk.setBirthYear(birthYear);
 
         JedisData.loadToJedisWithIndex(customerRisk, email, customerRisk.getRiskDate().getTime(), "BirthYear", String.valueOf(birthYear));
 
