@@ -129,6 +129,7 @@ public class JedisClient {
         }
 
         catch (Exception e){
+            System.out.println("error selecting data " + e.getMessage());
             jedisPool.returnBrokenResource(jedis);
 
             throw new Exception("Tried  to get range:"+key+" start:"+start+" end:"+end+" without success");
