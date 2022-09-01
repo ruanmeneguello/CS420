@@ -11,7 +11,6 @@ import com.getsimplex.steptimer.utils.*;
 import com.google.gson.Gson;
 import spark.Filter;
 import spark.Request;
-import spark.Filter;
 import spark.Response;
 import spark.Spark;
 
@@ -20,7 +19,6 @@ import java.util.logging.Logger;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 import static spark.Spark.*;
 
 public class WebAppRunner {
@@ -123,17 +121,21 @@ public class WebAppRunner {
             return response;
         });
 
-        get("/customer/:customer", (req, res)-> {
+        get("/customer/:phone", (req, res)-> {
+          String phone =  req.params(":phone");
+            Optional<User> optionalUser = Optional.empty();
             try {
-                userFilter(req, res);
+              optionalUser = userFilter(req, res);
             } catch (Exception e){
                 res.status(401);
                 logger.warning("*** Error Finding Customer: "+e.getMessage());
                 System.out.println("*** Error Finding Customer: "+e.getMessage());
                 return null;
             }
-            return FindCustomer.handleRequest(req);
-
+            if(optionalUser.isPresent() && optionalUser.get().getPhone().equals( SendText.getFormattedPhone(phone))){
+                return gson.toJson(CustomerService.getCustomerByPhone(phone));
+            }
+            return  null;
         });
 
         post("/login", (req, res)->loginUser(req, res));
@@ -274,7 +276,7 @@ public class WebAppRunner {
 
 
     public static void createNewCustomer(Request request, Response response) throws Exception{
-            CreateNewCustomer.handleRequest(request);
+            CustomerService.handleRequest(request);
     }
 
     private static String callUserDatabase(Request request)throws Exception{

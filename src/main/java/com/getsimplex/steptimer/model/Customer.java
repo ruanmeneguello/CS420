@@ -12,6 +12,7 @@ public class Customer {
     private String phone;
     private String birthDay;
 
+    private String gender;
     public String getCustomerName() {
         return customerName;
     }
@@ -43,6 +44,11 @@ public class Customer {
 
     public void setBirthDay(String birthDay) {
         this.birthDay = birthDay;
+    }
+
+    public String getGender(){ return gender; }
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
 }
