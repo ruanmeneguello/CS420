@@ -7,4 +7,5 @@ dependency-reduced-pom.xml
 dump.rdb
 .classpath
 .project
+bin
 
