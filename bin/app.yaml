@@ -1,0 +1,107 @@
+#© 2021 Sean Murdock
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stedi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stedi
+  template:
+    metadata:
+      labels:
+        app: stedi
+    spec:
+      containers:
+        - name: stedi
+          image: gcr.io/cubs-consulting/stedi
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secrets-dev
+                  key: REDIS_PASS
+            - name: REDIS_HOST
+              value: "redis-stedi-dev"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DB
+              value: "0"
+            - name: KAFKA_BROKER
+              value: "localhost:9092"
+            - name: TWILIO_ACCOUNT_SID
+              valueFrom:
+                secretKeyRef:
+                  name: twilio-dev
+                  key: twilio_account_sid
+            - name: TWILIO_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: twilio-dev
+                  key: twilio_token
+            - name: TWILIO_PHONE
+              value: "+17146778438"
+          ports:
+            - containerPort: 443
+          resources:
+            limits:
+              cpu: ".5"
+              memory: "500Mi"
+            requests:
+              cpu: ".25"
+              memory: "250Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 4567
+            initialDelaySeconds: 3
+            periodSeconds: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stedi-service
+spec:
+  selector:
+    app: stedi
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 4567
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stedi-nodeport
+spec:
+  selector:
+    app: stedi
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 4567
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: stedi-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: stedi-public
+    networking.gke.io/managed-certificates: stedi-certificate
+    kubernetes.io/ingress.allow-http: "false"
+spec:
+  backend:
+    serviceName: stedi-nodeport
+    servicePort: 80
+---
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: stedi-certificate
+spec:
+  domains:
+    - dev.stedi.me
+    
