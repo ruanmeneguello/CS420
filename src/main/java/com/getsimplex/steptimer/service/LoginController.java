@@ -45,7 +45,7 @@ public class LoginController {
     public static Boolean isValidPassword(String unauthenticatedName, String attemptedPwValue)throws Exception {
         boolean passwordIsValid = false;
         boolean userNameIsValid=false;
-        User currentUser = UserService.getUserByUserName(unauthenticatedName);
+        User currentUser = FindUser.getUserByUserName(unauthenticatedName);
 
         //use if logging in with Redis
         try {

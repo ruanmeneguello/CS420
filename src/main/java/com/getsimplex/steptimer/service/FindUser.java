@@ -6,15 +6,13 @@ import com.getsimplex.steptimer.model.User;
 import com.getsimplex.steptimer.utils.JedisData;
 import com.getsimplex.steptimer.utils.SendText;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 /**
  * Created by sean on 6/13/2017.
  */
-public class UserService {
+public class FindUser {
 
     public static User getUserByUserName(String userName) throws Exception{
 

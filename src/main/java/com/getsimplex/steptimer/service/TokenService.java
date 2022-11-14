@@ -37,7 +37,7 @@ public class TokenService {
         Optional<LoginToken> tokenOptional = lookupToken(userToken);
         if (tokenOptional.isPresent()){
             LoginToken loginToken = tokenOptional.get();
-            foundUser = Optional.of(UserService.getUserByUserName(loginToken.getUser()));
+            foundUser = Optional.of(FindUser.getUserByUserName(loginToken.getUser()));
         }
         return foundUser;
     }

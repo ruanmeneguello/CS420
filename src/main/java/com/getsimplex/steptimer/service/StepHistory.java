@@ -32,11 +32,17 @@ public class StepHistory {
 
     public static String riskScore(String email) throws Exception{
         logger.info("Received score request for: "+email);
-        Optional<Customer> customer = FindCustomer.findCustomer(email);
-
-        if (!customer.isPresent()){
-            throw new Exception ("Unable to score risk for non-existent customer: "+email);
+        Optional<Customer> customer = Optional.empty();
+        User user = FindUser.getUserByUserName(email);
+        if (user!=null) {
+            customer = FindCustomer.findCustomer(user.getPhone());
+            if (!customer.isPresent()){
+                throw new Exception ("Unable to score risk for non-existent customer: "+email);
+            }
+        } else{
+            throw new Exception("Unable to locate user: "+email);
         }
+
 
         List<RapidStepTest> rapidStepTestsSortedByDate = JedisData.getEntitiesByIndex(RapidStepTest.class,"CustomerId", email);
         Collections.sort(rapidStepTestsSortedByDate);

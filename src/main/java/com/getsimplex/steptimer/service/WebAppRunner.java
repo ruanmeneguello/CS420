@@ -209,7 +209,7 @@ public class WebAppRunner {
         User user=null;
         try {
             phoneNumber = SendText.getFormattedPhone(phoneNumber);
-            user = UserService.getUserByPhone(phoneNumber);
+            user = FindUser.getUserByPhone(phoneNumber);
             if (user!=null){
                 Long expiration = new Date().getTime()+100l * 365l * 24l *60l * 60l *1000l;//100 years
                 String loginToken=TokenService.createUserTokenSpecificTimeout(user.getUserName(), expiration);
