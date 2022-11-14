@@ -8,7 +8,7 @@ kind: Deployment
 # Metadata is information related to the object we created in Kubernetes
 metadata:
 # The name here is the name of our deployment  
-  name: stedi-sean-murdock
+  name: stedi
 spec:
 # Replicas refers to the number of pods we deploy
   replicas: 1
@@ -17,13 +17,13 @@ spec:
 # Matchlabels are a label for my selector  
     matchLabels:
 # App is a specific kind of label for my pod
-      app: stedi-sean-murdock
+      app: stedi
 # The Template describes all the features of my pod
   template:
 # The metadata provides labels for my template  
     metadata:
       labels:
-        app: stedi-sean-murdock
+        app: stedi
 # The spec refers to the specification of my containers in my pod        
     spec:
 # Containers can have one or more Docker containers in the pod
