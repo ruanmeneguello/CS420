@@ -23,11 +23,11 @@ public class CustomerService {
     private static Gson gson = new Gson();
     private static JedisClient jedisClient = new JedisClient();
 
-    public static String handleRequest(Request request) throws Exception{
+    public static String handleRequest(Request request, boolean update) throws Exception{
         String newCustomerRequest = request.body();
         Customer newCustomer = gson.fromJson(newCustomerRequest, Customer.class);
 
-        return createCustomer(newCustomer);
+        return createCustomer(newCustomer, update);
 
     }
     public static Customer getCustomerByPhone(String phoneNumber) throws Exception{
@@ -44,13 +44,13 @@ public class CustomerService {
         return customers.get(0);
 
     }
-    public static String createCustomer(Customer newCustomer) throws Exception{
+    public static String createCustomer(Customer newCustomer, boolean update) throws Exception{
         String phone = SendText.getFormattedPhone(newCustomer.getPhone());//ex: 801-719-0908 becomes: +18017190908
         newCustomer.setPhone(phone);
         String numericDigitsOnly = phone.replaceAll("[^0-9]","");
         ArrayList<Customer> matchingCustomers = JedisData.getEntitiesByScore(Customer.class, Long.valueOf(numericDigitsOnly), Long.valueOf(numericDigitsOnly));
         Optional<Customer> matchingCustomer = JedisData.getEntityById(Customer.class, newCustomer.getPhone());
-        if (matchingCustomers.size()>0 || matchingCustomer.isPresent()){
+        if (matchingCustomers.size()>0 || matchingCustomer.isPresent() && !update){
             throw new AlreadyExistsException("Customer already exists");
         }
 

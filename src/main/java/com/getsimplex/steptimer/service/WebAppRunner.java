@@ -121,6 +121,30 @@ public class WebAppRunner {
             return response;
         });
 
+        put("/customer", (req, res)-> {
+            String response;
+            try {
+                updateCustomer(req, res);
+                response="Successfully created customer";
+            }
+
+            catch (AlreadyExistsException ae){
+                logger.info("User already exists");
+                System.out.println("User already exists");
+                res.status(409);
+                logger.info("Error creating customer");
+                response="Error creating customer";
+            }
+
+            catch (Exception e){
+                logger.warning("*** Error Creating Customer: "+e.getMessage());
+                System.out.println("*** Error Creating Customer: "+e.getMessage());
+                res.status(500);
+                response="Error creating customer";
+            }
+            return response;
+        });
+
         get("/customer/:phone", (req, res)-> {
           String phone =  req.params(":phone");
             Optional<User> optionalUser = Optional.empty();
@@ -276,7 +300,11 @@ public class WebAppRunner {
 
 
     public static void createNewCustomer(Request request, Response response) throws Exception{
-            CustomerService.handleRequest(request);
+            CustomerService.handleRequest(request, false);
+    }
+
+    public static void updateCustomer(Request request, Response response) throws Exception{
+        CustomerService.handleRequest(request, true);
     }
 
     private static String callUserDatabase(Request request)throws Exception{
