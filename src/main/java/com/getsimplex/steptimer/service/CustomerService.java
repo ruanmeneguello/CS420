@@ -50,7 +50,7 @@ public class CustomerService {
         String numericDigitsOnly = phone.replaceAll("[^0-9]","");
         ArrayList<Customer> matchingCustomers = JedisData.getEntitiesByScore(Customer.class, Long.valueOf(numericDigitsOnly), Long.valueOf(numericDigitsOnly));
         Optional<Customer> matchingCustomer = JedisData.getEntityById(Customer.class, newCustomer.getPhone());
-        if (matchingCustomers.size()>0 || matchingCustomer.isPresent() && !update){
+        if ((matchingCustomers.size()>0 || matchingCustomer.isPresent()) && !update){
             throw new AlreadyExistsException("Customer already exists");
         }
 
