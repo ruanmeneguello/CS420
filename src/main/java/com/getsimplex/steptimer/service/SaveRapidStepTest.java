@@ -20,7 +20,7 @@ public class SaveRapidStepTest {
 
 
     public static void save(String rapidStepTestString) throws Exception{
-
+        System.out.println("Rapid Step Test:"+rapidStepTestString);
         RapidStepTest rapidStepTest = gson.fromJson(rapidStepTestString, RapidStepTest.class);
         JedisData.loadToJedisWithIndex(rapidStepTest,UUID.randomUUID().toString(), rapidStepTest.getStopTime(), "CustomerId",rapidStepTest.getCustomer());
         // The above adds the same data to 2 sorted sets:
