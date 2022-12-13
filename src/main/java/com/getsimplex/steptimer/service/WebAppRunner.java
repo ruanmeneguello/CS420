@@ -203,7 +203,8 @@ public class WebAppRunner {
                 System.out.println("*** Error Finding Risk Score: "+e.getMessage());
                 throw e;
             }
-           return null;
+           res.status(404);
+            return "User not found, or user doesn't match customer";
         }));
 
         options("/*",
