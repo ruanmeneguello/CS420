@@ -17,6 +17,10 @@ let verifyPassword = "";
             usertoken = hashparts[1];// the url should look like https://stedi.me/timer.html#4c2286a7-8fdc-47c5-b972-739769554c88
             validateToken();//check if token is expired, if not display the email, if expired send to login
         }
+        if(document.location=='/reset.html'){//we are resetting the password
+            const userName=sessionStorage.getItem('userName');
+            $('#email').html(userName);
+        }
     });
 
 function setusername(){
@@ -38,27 +42,6 @@ function setverifypassword(){
     }
 }
 
-function savetoken(token){
-// whatever passes as token should save into local storage
-    if (window.localStorage){
-     localStorage.setItem("token", token);
-    }
-
-}
-
-function checkexpiredtoken(token){
-// read token from local storage - check with ajax call
-    if(window.localStorage){
-    usertoken = localStorage.getItem("token");
-    $.ajax({
-       type: 'GET',
-        url: '/validate/'+token,
-        data: JSON.stringify({usertoken}),
-        success: function(data){savetoken(data)},
-        contentType: "application/text",
-        dataType: 'text' })
-    }
-}
 
 function checkvalidpassword(password){
 
@@ -113,67 +96,50 @@ function changePassword(){
 
 }
 
-function readonlyforms(formid){
-    form = document.getElementById(formid);
-    elements = form.elements;
-    for (i = 0, len = elements.length; i < len; ++i) {
-    elements[i].readOnly = true;
+const requestreset = async ()=>{
+    const cellNumber = document.getElementById("cellphone").value;
+    console.log(`Cell Number ${cellNumber}`);
+
+    const options = {
+        method:'POST',
+        "content-type":"application/text"
     }
-    createbutton();
-}
- function pwsDisableInput( element, condition ) {
-        if ( condition == true ) {
-            element.disabled = true;
 
-        } else {
-            element.removeAttribute("disabled");
-        }
+    await fetch("https://dev.stedi.me/twofactorlogin/"+cellNumber,options);
 
- }
+    sessionStorage.setItem("cellNumber",cellNumber);
 
-function createbutton(){
-    var button = document.createElement("input");
-    button.type = "button";
-    button.value = "OK";
-    button.onclick = window.location.href = "/index.html";
-    context.appendChild(button);
+    document.location="/enterotp.html";
 }
 
-
-function createuser(){
-    $.ajax({
-        type: 'POST',
-        url: '/user',
-        data: JSON.stringify({userName, 'email': userName, password, verifyPassword, 'accountType':'Personal'}),//we are using the email as the user name
-        success: function(data) { alert(data);
-//        readonlyforms("newUser");
-//        alert(readonlyforms("newUser"));
-        window.location.href = "/index.html"},
-        error: function(xhr) {
-            console.log(JSON.stringify(xhr))
-            if(xhr.status==409){
-                alert("Email or cell # has already been registered");
-            }
+const enterotp = async ()=>{
+    const otp = document.getElementById("otp").value;
+    const cellNumber = sessionStorage.getItem("cellNumber");
+    const options = {
+        method:'POST',
+        headers:{
+            "content-type":"application/json"
         },
-        contentType: "application/text",
-        dataType: 'text'
-    });
+        body:JSON.stringify({
+            phoneNumber:cellNumber,
+            oneTimePassword:otp
+        })
+    }
+
+    const resetTokenResponse = await fetch('https://dev.stedi.me/twofactorlogin',options)
+    const resetToken = await resetTokenResponse.text();
+    sessionStorage.setItem("suresteps.session.token",resetToken);
+
+    const verificationResponse = await fetch('https://dev.stedi.me/validate/'+resetToken);
+    const userName = await verificationResponse.text();
+
+    sessionStorage.setItem('userName',userName);
+
+    document.location='/reset.html';
+
 }
 
-function getstephistory(){
-      $.ajax({
-            type: 'POST',
-            url: '/stephistory',
-            data: JSON.stringify({userName}),
-            success: function(data) { alert(data);
-            json = $.parseJSON(data);
-            $('#results').html(json.name+' Total Steps: ' + json.stepTotal)},
-            contentType: "application/text",
-            dataType: 'text'
-        });
-}
-
-var enterFunction = (event) =>{
+const enterFunction = (event) =>{
     if (event.keyCode === 13){
         event.preventDefault();
         $("#loginbtn").click();
@@ -182,4 +148,8 @@ var enterFunction = (event) =>{
 
 var passwordField = document.getElementById("password");
 
-passwordField.addEventListener("keyup", enterFunction);
+var cellPhoneField = document.getElementById("cellphone");
+
+passwordField!=null && passwordField.addEventListener("keyup", enterFunction);
+
+cellPhoneField!=null && cellPhoneField.addEventListener("keyup",enterFunction);

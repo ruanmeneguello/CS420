@@ -17,15 +17,12 @@
 
     <form name="loginForm" id="login" method="post" >
         <p>
-            <label class="stepcount" for="email">Email Address</label><br>
-            <input class="stepcount" id="email" name="username" size="25" required >
-        </p>
-        <p>
+            <label class="stepcount" for="cellphone">User/Password Recovery</span></label><br>
             <label class="stepcount" for="cellphone">Cell Phone</span></label><br>
             <input class="stepcount" id="cellphone" name="pwd" size="25" required >
         </p>
         <p>
-            <input class="btn btn-lg btn-primary" id="loginbtn" type="button" value="Submit">
+            <input class="btn btn-lg btn-primary" id="loginbtn" type="button" onclick="requestreset()" value="Submit">
         </p>
 
     </form>

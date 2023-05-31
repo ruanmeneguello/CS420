@@ -5,8 +5,7 @@
 <div style="height: 90px">
 <head>
     <meta charset="UTF-8">
-    <title>Reset your STEDI Password</title>
-    <p class="stepcount">Your username is: <a id="email"></a></p>
+    <title>Enter your one time password</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
     <link rel="shortcut icon" href= "favicon.ico" type="image/x-icon" />
 </head>
@@ -18,15 +17,12 @@
 
     <form name="loginForm" id="login" method="post" >
         <p>
-            <label class="stepcount" for="password">New Password</label><br>
-            <input class="stepcount" type="password" id="password" name="username" size="25" onchange="setuserpassword()" required >
+            <label class="stepcount" for="otp">User/Password Recovery</span></label><br>
+            <label class="stepcount" for="otp">One Time Password</span></label><br>
+            <input class="stepcount" id="otp" name="pwd" size="25" required >
         </p>
         <p>
-            <label class="stepcount" for="verifypassword">Verify Password</span></label><br>
-            <input class="stepcount" type="password" id="verifypassword" name="pwd" size="25" onchange="setverifypassword()" required >
-        </p>
-        <p>
-            <input class="btn btn-lg btn-primary" id="loginbtn" type="button" onclick="changePassword()" value="Submit">
+            <input class="btn btn-lg btn-primary" id="loginbtn" type="button" onclick="enterotp()" value="Submit">
         </p>
 
     </form>
