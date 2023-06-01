@@ -17,7 +17,7 @@ let verifyPassword = "";
             usertoken = hashparts[1];// the url should look like https://stedi.me/timer.html#4c2286a7-8fdc-47c5-b972-739769554c88
             validateToken();//check if token is expired, if not display the email, if expired send to login
         }
-        if(document.location=='/reset.html'){//we are resetting the password
+        if(window.location.href.includes('/reset.html')){//we are resetting the password
             const userName=sessionStorage.getItem('userName');
             $('#email').html(userName);
         }
@@ -80,16 +80,21 @@ function userlogin(){
 }
 
 function changePassword(){
+    const userName = sessionStorage.getItem("userName");
+    const token = sessionStorage.getItem("suresteps.session.token");
     $.ajax({
-        type: 'POST',
-        url: '/reset',
-        data: JSON.stringify({password, verifyPassword}),
+        type: 'PATCH',
+        url: `/user/${userName}`,
+        data: JSON.stringify({password}),
         success: function(data){
             alert("Password successfully updated!");
             window.location.href="/index.html"
         },
         contentType: "application/text",
-        dataType:"text"
+        dataType:"text",
+        headers:{
+            "suresteps.session.token":token
+        }
 
 
     })
@@ -105,7 +110,7 @@ const requestreset = async ()=>{
         "content-type":"application/text"
     }
 
-    await fetch("https://dev.stedi.me/twofactorlogin/"+cellNumber,options);
+    await fetch("/twofactorlogin/"+cellNumber,options);
 
     sessionStorage.setItem("cellNumber",cellNumber);
 
@@ -126,16 +131,16 @@ const enterotp = async ()=>{
         })
     }
 
-    const resetTokenResponse = await fetch('https://dev.stedi.me/twofactorlogin',options)
+    const resetTokenResponse = await fetch('/twofactorlogin',options)
     const resetToken = await resetTokenResponse.text();
     sessionStorage.setItem("suresteps.session.token",resetToken);
 
-    const verificationResponse = await fetch('https://dev.stedi.me/validate/'+resetToken);
+    const verificationResponse = await fetch('/validate/'+resetToken);
     const userName = await verificationResponse.text();
 
     sessionStorage.setItem('userName',userName);
 
-    document.location='/reset.html';
+    window.location.href='/reset.html';
 
 }
 

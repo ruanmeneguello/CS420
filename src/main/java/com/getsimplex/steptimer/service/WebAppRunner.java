@@ -9,12 +9,15 @@ package com.getsimplex.steptimer.service;
 import com.getsimplex.steptimer.model.*;
 import com.getsimplex.steptimer.utils.*;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.apache.commons.codec.digest.DigestUtils;
 import spark.Filter;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
 
 import java.util.Date;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -69,6 +72,31 @@ public class WebAppRunner {
             return response;
         }
             );
+        patch("/user/:username",(req,res)->{//update password
+            userFilter(req,res);
+            User existingUser = (User) JedisData.getFromRedisMap(req.params("username"), User.class);
+            String response = "";
+            if (existingUser!=null){
+                User userUpdate = gson.fromJson(req.body(),User.class);
+                if (CreateNewUser.validatePassword(userUpdate.getPassword())){
+                    existingUser.setPassword(DigestUtils.sha256Hex(userUpdate.getPassword()));
+                    JedisData.updateRedisMap(existingUser,existingUser.getUserName());
+                    res.status(200);
+                    response = "Updated password";
+                    res.body(response);
+                } else{
+                    res.status(400);
+                    response="Password doesn't meet requirements";
+                    res.body(response);
+                }
+            } else{
+                res.status(404);//user not found
+                response = "User "+req.params("username")+" not found.";
+                res.body(response);
+            }
+
+            return response;
+        });
         get("/validate/:token", (req,res)->SessionValidator.emailFromToken(req.params(":token")));
         get("/simulation", (req, res) -> SimulationDataDriver.getSimulationActive());
         post("/simulation", (req, res)-> MessageIntake.route(new StartSimulation(30)));

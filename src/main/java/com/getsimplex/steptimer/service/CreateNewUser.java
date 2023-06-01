@@ -31,6 +31,9 @@ public class CreateNewUser {
         JedisData.deleteJedis(User.class, userName);
     }
 
+    public static void updatePassword(String userName, String password) throws Exception{
+        JedisData.getFromRedisMap(userName, User.class);
+    }
     public static String createUser(User createUser) throws Exception{
         User addUser = new User();
 

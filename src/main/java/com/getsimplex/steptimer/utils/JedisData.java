@@ -103,13 +103,13 @@ public class JedisData {
         JedisClient.hmset(object.getClass().getSimpleName()+"Map", key, gson.toJson(object));
     }
 
-    public static <T> void set(T object, String keyName) throws Exception{
-        String jsonFormatted = gson.toJson(object, object.getClass());
-        JedisClient.set(keyName, jsonFormatted);
+    public static <T> void updateRedisMap(T record, String id) throws Exception{
+        String jsonFormatted = gson.toJson(record, record.getClass());
+        JedisClient.hmset(record.getClass().getSimpleName()+"Map", id, jsonFormatted);
     }
 
-    public static <T> T get(String keyName, Class clazz) throws Exception{
-        String jsonFormatted = JedisClient.get(keyName);
+    public static <T> T getFromRedisMap(String id, Class clazz) throws Exception{
+        String jsonFormatted = JedisClient.hmget(clazz.getSimpleName()+"Map",id).get();
         T object = (T) gson.fromJson(jsonFormatted, clazz);
         return object;
     }
