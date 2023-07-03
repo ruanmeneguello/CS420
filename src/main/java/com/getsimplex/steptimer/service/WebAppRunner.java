@@ -11,6 +11,7 @@ import com.getsimplex.steptimer.utils.*;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.w3c.dom.Text;
 import spark.Filter;
 import spark.Request;
 import spark.Response;
@@ -98,6 +99,20 @@ public class WebAppRunner {
             return response;
         });
         get("/validate/:token", (req,res)->SessionValidator.emailFromToken(req.params(":token")));
+        post("/sendtext",(req,res)->{//this url is for the DevOps class at BYUI so they can deploy STEDI and not need Twilio Credentials
+            //It only allows them to log in with their own user as long as it exits in the dev.stedi.me application
+            Gson gson = new Gson();
+            TextMessage textMessage = gson.fromJson(req.body(), TextMessage.class);//
+            Optional<User> userOptional = userFilter(req,res);
+            if (!userOptional.isEmpty() && userOptional.get().getPhone().equals(SendText.getFormattedPhone(textMessage.getPhoneNumber()))) {
+                SendText.send(textMessage.getPhoneNumber(), textMessage.getMessage());
+                res.status(200);
+                return "Text Sent";
+            } else{
+                res.status(400);
+                return "Recipient doesn't match user or user not found: Text not sent";
+            }
+        });
         get("/simulation", (req, res) -> SimulationDataDriver.getSimulationActive());
         post("/simulation", (req, res)-> MessageIntake.route(new StartSimulation(30)));
         delete("/simulation", (req, res)-> MessageIntake.route(new StopSimulation()));
@@ -192,6 +207,7 @@ public class WebAppRunner {
 
         post("/login", (req, res)->loginUser(req, res));
         post("/twofactorlogin/:phoneNumber",(req, res) -> twoFactorLogin(req, res));
+
         post("/twofactorlogin", (req, res) ->{
             String response = "";
            try{
@@ -302,7 +318,7 @@ public class WebAppRunner {
     }
 
     private static Optional<User> userFilter(Request request, Response response) throws Exception{
-        String tokenString = request.headers("suresteps.session.token");
+            String tokenString = request.headers("suresteps.session.token");
 
             Optional<User> user = TokenService.getUserFromToken(tokenString);//
 
