@@ -26,6 +26,8 @@ spec:
         app: stedi
 # The spec refers to the specification of my containers in my pod        
     spec:
+      nodeSelector:
+        cloud.google.com/gke-spot: "true"    
 # Containers can have one or more Docker containers in the pod
       containers:
 # The name of the container is specified below      
