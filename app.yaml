@@ -120,10 +120,11 @@ metadata:
   name: stedi-ingress
   annotations:
     kubernetes.io/ingress.global-static-ip-name: stedi-public
-    networking.gke.io/managed-certificates: stedi-certificate
-    kubernetes.io/ingress.allow-http: "false"
+    networking.gke.io/managed-certificates: stedi-certificate    
+#    kubernetes.io/ingress.allow-http: "false"
     # the below line wasn't there before
     kubernetes.io/ingress.class: "gce"
+    networking.gke.io/v1beta1.FrontendConfig: stedi-frontend-config
 spec:
   defaultBackend:
     service:
@@ -138,4 +139,13 @@ metadata:
 spec:
   domains:
     - dev.stedi.me
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: stedi-frontend-config
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT
     
