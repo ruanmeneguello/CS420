@@ -3,12 +3,14 @@
 package com.getsimplex.steptimer.service;
 
 import com.getsimplex.steptimer.model.*;
+import com.getsimplex.steptimer.utils.NotFoundException;
 import com.google.gson.Gson;
 import spark.Request;
 import com.getsimplex.steptimer.utils.GsonFactory;
 import com.getsimplex.steptimer.utils.JedisData;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
@@ -47,7 +49,7 @@ public class StepHistory {
         List<RapidStepTest> rapidStepTestsSortedByDate = JedisData.getEntitiesByIndex(RapidStepTest.class,"CustomerId", email);
         Collections.sort(rapidStepTestsSortedByDate);
         if (rapidStepTestsSortedByDate.size()<4){
-            throw new Exception("Customer "+email+" has: "+rapidStepTestsSortedByDate.size()+" rapid step tests on file which is less than the required number(4) to calculate fall risk.");
+            throw new NotFoundException("Customer "+email+" has: "+rapidStepTestsSortedByDate.size()+" rapid step tests on file which is less than the required number(4) to calculate fall risk.");
         }
 
         RapidStepTest mostRecentTest = rapidStepTestsSortedByDate.get(rapidStepTestsSortedByDate.size()-1);
@@ -67,7 +69,7 @@ public class StepHistory {
         Integer birthYear = Integer.valueOf(customer.get().getBirthDay().split("-")[0]);
 
         CustomerRisk customerRisk = new CustomerRisk();
-        customerRisk.setScore(new Float(riskScore.setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+        customerRisk.setScore(riskScore.setScale(2, RoundingMode.HALF_UP).toBigInteger().floatValue());
         customerRisk.setCustomer(email);
         customerRisk.setRiskDate(new Date(mostRecentTest.getStopTime()));
         customerRisk.setBirthYear(birthYear);

@@ -8,7 +8,10 @@ package com.getsimplex.steptimer.service;
 
 import com.getsimplex.steptimer.model.*;
 import com.getsimplex.steptimer.utils.*;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.w3c.dom.Text;
@@ -26,7 +29,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import static spark.Spark.*;
 
 public class WebAppRunner {
+
     private static Gson gson = new Gson();
+
     private static Logger logger = Logger.getLogger(WebAppRunner.class.getName());
     public static void main(String[] args){
 
@@ -235,20 +240,29 @@ public class WebAppRunner {
             return "Saved";
         });
         get("/riskscore/:customer",((req,res) -> {
+            String customer = req.params(":customer");
+            String returnBody = "";
             try{
                 Optional<User> user = userFilter(req, res);
-               String customer = req.params(":customer");
+
                 if (user.isPresent() && user.get().getEmail().equals(customer)) {
-                    return riskScore(req.params(":customer"));
+                    returnBody= riskScore(req.params(":customer"));
+                } else{
+                    res.status(404);
+                    returnBody= "Unable to locate customer for risk score: "+customer;
                 }
             } catch (Exception e){
-                res.status(401);
-                logger.info("*** Error Finding Risk Score: "+e.getMessage());
-                System.out.println("*** Error Finding Risk Score: "+e.getMessage());
-                throw e;
+                logger.info("*** Issue Finding Risk Score for: "+customer+ " "+e.getMessage());
+                System.out.println("*** Issue Finding Risk Score: "+e.getMessage());
+                if(e instanceof NotFoundException){
+                    ErrorPayload errorPayload= new ErrorPayload(e.getMessage());
+                    returnBody=gson.toJson(errorPayload);
+                    res.status(412);//precondition failed
+                } else{
+                    res.status(400);
+                }
             }
-           res.status(404);
-            return "User not found, or user doesn't match customer";
+            return returnBody;
         }));
 
         options("/*",

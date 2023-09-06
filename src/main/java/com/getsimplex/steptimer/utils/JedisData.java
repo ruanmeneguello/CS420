@@ -48,7 +48,7 @@ public class JedisData {
 
 
     public static synchronized <T> ArrayList<T> getEntitiesByScore(Class clazz, long beginScore, long endScore) throws Exception{
-        Set<String> set = JedisClient.zrangeByScore(clazz.getSimpleName(), beginScore, endScore);
+        List<String> set = JedisClient.zrangeByScore(clazz.getSimpleName(), beginScore, endScore);
         ArrayList<T> arrayList = new ArrayList<T>();
 
         // loop through all the keys from the sorted set and for each key get the value from the redis map
@@ -65,7 +65,7 @@ public class JedisData {
     }
 
     public static synchronized <T> ArrayList<T> getEntities(Class clazz) throws Exception{
-        Set<String> set = JedisClient.zrange(clazz.getSimpleName(), 0, -1);
+        List<String> set = JedisClient.zrange(clazz.getSimpleName(), 0, -1);
         ArrayList<T> arrayList = new ArrayList<T>();
 
         // loop through all the keys from the sorted set and for each key get the value from the redis map
@@ -82,7 +82,7 @@ public class JedisData {
     }
 
     public static <T> ArrayList<T> getEntitiesByIndex(Class clazz, String indexName, String index) throws Exception{
-        Set<String> set = JedisClient.zrangeByScore(clazz.getSimpleName()+"By"+indexName+"-"+index, 0, Long.MAX_VALUE);
+        List<String> set = JedisClient.zrangeByScore(clazz.getSimpleName()+"By"+indexName+"-"+index, 0, Long.MAX_VALUE);
         ArrayList<T> arrayList = new ArrayList<T>();
 
         // loop through all the keys from the sorted set and for each key get the value from the redis map

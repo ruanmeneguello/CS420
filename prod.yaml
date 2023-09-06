@@ -14,6 +14,8 @@ spec:
       labels:
         app: stedi-prod
     spec:
+      nodeSelector:
+        cloud.google.com/gke-spot: "true"    
       containers:
         - name: stedi-prod
           image: gcr.io/cubs-consulting/stedi
@@ -92,6 +94,33 @@ spec:
             port:
               number: 80
 ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: stedi-prod-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: stedi-prod-public
+    networking.gke.io/managed-certificates: stedi-prod-certificate    
+#    kubernetes.io/ingress.allow-http: "false"
+    # the below line wasn't there before
+    kubernetes.io/ingress.class: "gce"
+    networking.gke.io/v1beta1.FrontendConfig: stedi-prod-frontend-config
+spec:
+  defaultBackend:
+    service:
+      name: stedi-prod-nodeport
+      port:
+        number: 80
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: stedi-prod-frontend-config
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: MOVED_PERMANENTLY_DEFAULT
+---            
 apiVersion: networking.gke.io/v1
 kind: ManagedCertificate
 metadata:

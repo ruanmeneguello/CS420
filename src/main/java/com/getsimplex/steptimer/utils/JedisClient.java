@@ -105,10 +105,11 @@ public class JedisClient {
 //        }
 //    }
 
-    public static synchronized Set<String> zrange(String key, long start, long end) throws Exception{
+    public static synchronized List<String> zrange(String key, long start, long end) throws Exception{
         Jedis jedis = jedisPool.getResource();
         try {
-            Set<String> results = jedis.zrange(key,start,end);
+
+            List<String> results = jedis.zrange(key,start,end);
             jedisPool.returnResource(jedis);
             return results;
         }
@@ -120,10 +121,10 @@ public class JedisClient {
         }
     }
 
-    public static synchronized Set<String> zrangeByScore (String key, long start, long end) throws Exception{
+    public static synchronized List<String> zrangeByScore (String key, long start, long end) throws Exception{
         Jedis jedis = jedisPool.getResource();
         try {
-            Set<String> results = jedis.zrangeByScore(key,start,end);
+            List<String> results = jedis.zrangeByScore(key,start,end);
             jedisPool.returnResource(jedis);
             return results;
         }
