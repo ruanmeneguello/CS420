@@ -230,14 +230,24 @@ public class WebAppRunner {
             return response;
         });
         post("/rapidsteptest", (req, res)->{
+            String returnBody="";
             try{
-                userFilter(req, res);
+                Optional<User> user = userFilter(req, res);
+                RapidStepTest rapidStepTest = gson.fromJson(req.body(), RapidStepTest.class);
+
+                if(user.isPresent() && user.get().getEmail().equals(rapidStepTest.getCustomer())) {
+
+                    saveStepSession(req);
+                    returnBody= "Saved";
+                } else{
+                    res.status(400);
+                    returnBody= "Error locating customer";
+                }
+
             } catch (Exception e){
                 res.status(401);
             }
-
-            saveStepSession(req);
-            return "Saved";
+            return returnBody;
         });
         get("/riskscore/:customer",((req,res) -> {
             String customer = req.params(":customer");

@@ -5,16 +5,13 @@ package com.getsimplex.steptimer.service;
 import com.getsimplex.steptimer.model.*;
 import com.getsimplex.steptimer.utils.NotFoundException;
 import com.google.gson.Gson;
-import spark.Request;
 import com.getsimplex.steptimer.utils.GsonFactory;
 import com.getsimplex.steptimer.utils.JedisData;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 
 /**
@@ -37,7 +34,7 @@ public class StepHistory {
         Optional<Customer> customer = Optional.empty();
         User user = FindUser.getUserByUserName(email);
         if (user!=null) {
-            customer = FindCustomer.findCustomer(user.getPhone());
+            customer = CustomerService.findCustomerByEmail(user.getPhone());
             if (!customer.isPresent()){
                 throw new Exception ("Unable to score risk for non-existent customer: "+email);
             }

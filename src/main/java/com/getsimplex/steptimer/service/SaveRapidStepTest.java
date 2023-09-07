@@ -2,14 +2,14 @@
 
 package com.getsimplex.steptimer.service;
 
-import com.getsimplex.steptimer.model.LoginToken;
+import com.getsimplex.steptimer.model.Customer;
+import com.getsimplex.steptimer.model.User;
+import com.getsimplex.steptimer.utils.JedisClient;
 import com.google.gson.Gson;
 import com.getsimplex.steptimer.model.RapidStepTest;
-import spark.Request;
 import com.getsimplex.steptimer.utils.GsonFactory;
-import com.getsimplex.steptimer.utils.JedisData;
 
-import java.util.*;
+import java.util.Optional;
 
 
 /**
@@ -22,10 +22,13 @@ public class SaveRapidStepTest {
     public static void save(String rapidStepTestString) throws Exception{
         System.out.println("Rapid Step Test:"+rapidStepTestString);
         RapidStepTest rapidStepTest = gson.fromJson(rapidStepTestString, RapidStepTest.class);
-        JedisData.loadToJedisWithIndex(rapidStepTest,UUID.randomUUID().toString(), rapidStepTest.getStopTime(), "CustomerId",rapidStepTest.getCustomer());
-        // The above adds the same data to 2 sorted sets:
-        // - one containing all the customer's step tests
-        // - one containing step tests for all customers
-        // Both are sorted in ascending order (when using zrange) of the stop time of the test
+        User user = FindUser.getUserByUserName(rapidStepTest.getCustomer());//we are assuming the user is testing their own risk
+
+        JedisClient.jsonArrayAdd("RapidStepTests","$."+user.getPhone(),rapidStepTest);
+        // The above adds the data to a redis key called RapidStepTests which is a JSON object with the key being the customer phone number:
+        // - the array for each phone number contains all the rapid step tests for the customer
+        //- the array is in ascending order of the creation time of the test
+
+
     }
 }
