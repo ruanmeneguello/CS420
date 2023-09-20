@@ -47,8 +47,8 @@ steps:
       - 'stedi'
       - '--replicas=0'
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-1'
+      - 'CLOUDSDK_COMPUTE_ZONE=us-east1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=autopilot-cluster-1'
 
       # This step deploys the application in Kubernetes
   - name: 'gcr.io/cloud-builders/gke-deploy'
@@ -56,8 +56,8 @@ steps:
       - run
       - --filename=app.yaml
       - --image=gcr.io/$PROJECT_ID/stedi:$SHORT_SHA
-      - --location=us-east1-b
-      - --cluster=cluster-1
+      - --location=us-east1
+      - --cluster=autopilot-cluster-1
 
   # This step scales up the stedi pod
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -68,5 +68,5 @@ steps:
       - 'stedi'
       - '--replicas=1'
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=us-east1-b'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-1'
+      - 'CLOUDSDK_COMPUTE_ZONE=us-east1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=autopilot-cluster-1'
