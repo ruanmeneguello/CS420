@@ -92,6 +92,10 @@ public class CreateNewUser {
             addUser.setDeviceNickName(deviceId);
         }
 
+        addUser.setAgreedToTermsOfUseDate(createUser.getAgreedToTermsOfUseDate());
+        addUser.setAgreedToCookiePolicyDate(createUser.getAgreedToCookiePolicyDate());
+        addUser.setAgreedToPrivacyPolicyDate(createUser.getAgreedToPrivacyPolicyDate());
+
 
 
         //SAVE USER TO REDIS

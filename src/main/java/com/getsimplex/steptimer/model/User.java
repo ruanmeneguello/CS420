@@ -20,6 +20,12 @@ public class User {
     private String deviceNickName;
     private boolean locked;
 
+    private long agreedToPrivacyPolicyDate;
+
+    private long agreedToCookiePolicyDate;
+
+    private long agreedToTermsOfUseDate;
+
 
     public String getPassword() {
         return password;
@@ -83,5 +89,29 @@ public class User {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    public long getAgreedToPrivacyPolicyDate() {
+        return agreedToPrivacyPolicyDate;
+    }
+
+    public void setAgreedToPrivacyPolicyDate(long agreedToPrivacyPolicyDate) {
+        this.agreedToPrivacyPolicyDate = agreedToPrivacyPolicyDate;
+    }
+
+    public long getAgreedToCookiePolicyDate() {
+        return agreedToCookiePolicyDate;
+    }
+
+    public void setAgreedToCookiePolicyDate(long agreedToCookiePolicyDate) {
+        this.agreedToCookiePolicyDate = agreedToCookiePolicyDate;
+    }
+
+    public long getAgreedToTermsOfUseDate() {
+        return agreedToTermsOfUseDate;
+    }
+
+    public void setAgreedToTermsOfUseDate(long agreedToTermsOfUseDate) {
+        this.agreedToTermsOfUseDate = agreedToTermsOfUseDate;
     }
 }

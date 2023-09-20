@@ -6,6 +6,33 @@ let bday = "";
 let form = "";
 let elements = "";
 
+
+const checkBoxListener = ()=>{
+    const signUpButton = document.getElementById("createbtn");
+    const privacyCheckBox = document.getElementById("privacyCheckBox");
+    const termsOfUseCheckBox = document.getElementById("termsOfUseCheckBox");
+    const cookiePolicyCheckBox = document.getElementById("cookiePolicyCheckBox");
+
+    if(privacyCheckBox.checked && termsOfUseCheckBox.checked && cookiePolicyCheckBox.checked){
+        signUpButton.disabled=false;
+    } else{
+        signUpButton.disabled=true;
+    }
+}
+
+$(document).ready(function(){
+
+   const privacyCheckBox = document.getElementById("privacyCheckBox");
+   privacyCheckBox.addEventListener('change',checkBoxListener);
+
+   const termsOfUseCheckBox = document.getElementById("termsOfUseCheckBox");
+   termsOfUseCheckBox.addEventListener('change',checkBoxListener);
+
+   const cookiePolicyCheckBox = document.getElementById("cookiePolicyCheckBox");
+   cookiePolicyCheckBox.addEventListener('change',checkBoxListener);
+
+});
+
 function setcustomername(){
     customerName = $("#cn").val();
 }
@@ -80,7 +107,7 @@ function createcustomer(){
     $.ajax({
         type: 'POST',
         url: '/user',
-        data: JSON.stringify({'userName':email, email, password, phone, "birthDate":bday, verifyPassword}),//we are using the email as the user name
+        data: JSON.stringify({'userName':email, email, password, phone, "birthDate":bday, verifyPassword, agreedToTermsOfUseDate: new Date().getTime(), agreedToCookiePolicyDate: new Date().getTime(), agreedToPrivacyPolicyDate: new Date().getTime()}),//we are using the email as the user name
         success: function(data) {
             createCustomer(data);
         },

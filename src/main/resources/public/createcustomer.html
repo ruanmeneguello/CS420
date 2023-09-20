@@ -24,7 +24,7 @@
         <input class="stepcount" type="email" id="email" name="email" size="50" onchange="setemail()">
     </p>
     <p>
-        <label class="stepcount" for="newUser"><span>*</span> Phone Number: </label><br>
+        <label class="stepcount" for="newUser"><span>*</span> Cell Phone Number (used for sending One Time Passwords - reply STOP to opt out): </label><br>
         <input class="stepcount" type="tel" id="phone" name="phone" size="12" onchange="setphone()" required>
     </p>
     <p>
@@ -39,11 +39,23 @@
         <label class="stepcount" for="newUser"><span>*</span> Verify Password: </label><br>
         <input class="stepcount" type="text" id="verifypassword" name="verifypassword" size="25" onchange="setverifypassword()" required>
     </p>
+    <p>
+        <input type="checkbox" id="privacyCheckBox"/>
+        <label class="stepcount" for="privacyCheckBox"><span>*</span> I have read and agree to the <a href="/privacy-policy.html">Privacy Policy</a>: </label><br>
+    </p>
+    <p>
+        <input type="checkbox" id="termsOfUseCheckBox"/>
+        <label class="stepcount" for="termsOfUseCheckBox"><span>*</span> I have read and agree to the <a href="/terms-of-use.html">Terms of Use Policy</a>: </label><br>
+    </p>
+    <p>
+        <input type="checkbox" id="cookiePolicyCheckBox"/>
+        <label class="stepcount" for="cookiePolicyCheckBox"><span>*</span> I have read and agree to the <a href="/privacy-policy.html">Cookie Policy</a>: </label><br>
+    </p>
     <br>
     <div style="text-align:left">
 
         <p>
-            <input class="btn btn-lg btn-primary" id="createbtn" type="button" onclick="createcustomer()" value="Submit">
+            <input disabled=true class="btn btn-lg btn-primary" id="createbtn" type="button" onclick="createcustomer()" value="Submit">
         </p>
     </div>
 </form>
