@@ -95,6 +95,7 @@ public class CreateNewUser {
         addUser.setAgreedToTermsOfUseDate(createUser.getAgreedToTermsOfUseDate());
         addUser.setAgreedToCookiePolicyDate(createUser.getAgreedToCookiePolicyDate());
         addUser.setAgreedToPrivacyPolicyDate(createUser.getAgreedToPrivacyPolicyDate());
+        addUser.setAgreedToTextMessageDate(createUser.getAgreedToTextMessageDate());
 
 
 

@@ -20,6 +20,7 @@ public class User {
     private String deviceNickName;
     private boolean locked;
 
+    private long agreedToTextMessageDate;
     private long agreedToPrivacyPolicyDate;
 
     private long agreedToCookiePolicyDate;
@@ -113,5 +114,13 @@ public class User {
 
     public void setAgreedToTermsOfUseDate(long agreedToTermsOfUseDate) {
         this.agreedToTermsOfUseDate = agreedToTermsOfUseDate;
+    }
+
+    public long getAgreedToTextMessageDate() {
+        return agreedToTextMessageDate;
+    }
+
+    public void setAgreedToTextMessageDate(long agreedToTextMessageDate) {
+        this.agreedToTextMessageDate = agreedToTextMessageDate;
     }
 }
