@@ -92,7 +92,7 @@ kind: Ingress
 metadata:
   name: stedi-prod-ingress
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: stedi-prod-public
+    kubernetes.io/ingress.global-static-ip-name: stedi-public
     networking.gke.io/managed-certificates: stedi-prod-certificate    
 #    kubernetes.io/ingress.allow-http: "false"
     # the below line wasn't there before
