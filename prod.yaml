@@ -33,8 +33,21 @@ spec:
               value: "0"
             - name: KAFKA_BROKER
               value: "localhost:9092"
+            - name: TWILIO_ACCOUNT_SID
+              valueFrom:
+                secretKeyRef:
+                  name: twilio-dev
+                  key: twilio_account_sid
+            - name: TWILIO_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: twilio-dev
+                  key: twilio_token
+            - name: TWILIO_PHONE
+              value: "+17146778438"
+# The ports is a list of tcp ports the pod listens on
           ports:
-            - containerPort: 443
+            - containerPort: 80
           resources:
             limits:
               cpu: ".5"
@@ -73,26 +86,6 @@ spec:
   ports:
     - port: 80
       targetPort: 4567
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: stedi-prod-ingress
-  annotations:
-    kubernetes.io/ingress.global-static-ip-name: stedi-prod-public
-    networking.gke.io/managed-certificates: stedi-prod-certificate
-    # kubernetes.io/ingress.allow-http: "false"
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: stedi-prod-nodeport
-            port:
-              number: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
