@@ -21,7 +21,7 @@ steps:
       - --filename=prod.yaml
       - --image=gcr.io/$PROJECT_ID/stedi:latest
       - --location=us-east1
-      - --cluster=autopilotcluster-1
+      - --cluster=autopilot-cluster-1
 
   # This step scales up the stedi pod
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -33,4 +33,4 @@ steps:
       - '--replicas=1'
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-east1'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=cluster-1'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=autopilot-cluster-1'
