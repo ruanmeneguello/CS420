@@ -319,7 +319,7 @@ public class WebAppRunner {
                 oneTimePassword.setPhoneNumber(phoneNumber);
                 OneTimePasswordService.saveOneTimePassword(oneTimePassword);
 
-                SendText.send(phoneNumber, "STEDI OTP: "+String.valueOf(randomNum));
+                SendText.send(phoneNumber, "Your STEDI one-time password is : "+String.valueOf(randomNum));
                 response.status(200);
 
             } else{
