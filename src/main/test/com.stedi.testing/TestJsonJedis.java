@@ -1,27 +1,46 @@
 package com.stedi.testing;
 
+import com.getsimplex.steptimer.datarepository.GenericRepository;
 import com.getsimplex.steptimer.model.Customer;
+import com.getsimplex.steptimer.model.EmailMessage;
 import com.getsimplex.steptimer.utils.JedisClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class TestJsonJedis {
 
     public static void main (String[] args) throws Exception{
-        JedisClient jedisClient = new JedisClient();
-        Object object = jedisClient.jsonGet("arr");
-        System.out.println("Object "+object);
+
+        GenericRepository messageRepository = new GenericRepository<EmailMessage>();
+        //JedisClient jedisClient = new JedisClient();
+
         Customer customer = new Customer();
-        customer.setCustomerName("Sean Murdock");
-        customer.setPhone("8017190908");
-        customer.setEmail("scmurdock@gmail.com");
+        customer.setCustomerName("John Smith");
+        customer.setPhone("8015551212");
+        customer.setEmail("johnsmith@gmail.com");
         customer.setGender("male");
-        customer.setBirthDay("05/03/1979");
+        customer.setBirthDay("01/01/2001");
 
-        jedisClient.jsonArrayAdd("TestCustomersArray","$" ,customer);
+        EmailMessage emailMessage = new EmailMessage();
 
-        object = jedisClient.jsonGet("TestCustomersArray");
+        emailMessage.setMessageText("Hi");
+        emailMessage.setName("John Doe");
+        emailMessage.setSubject("Test");
+        emailMessage.setToAddress("johndoe@gmail.com");
 
-        System.out.println("Updated customer array:"+object);
+        //jedisClient.jsonArrayAdd("TestCustomersArray","$" ,customer);
 
+        messageRepository.addToArrayAtKey(emailMessage.getToAddress(),emailMessage);//we a
 
+        ArrayList<EmailMessage> emailsToJohn = messageRepository.getArrayAtKey("johndoe@gmail.com");
+
+//        for(Object object:jsonArray){
+//            JSONObject jsonObject = (JSONObject) object;
+//            System.out.println(jsonObject.toString());
+//        }
+
+        emailsToJohn.forEach((EmailMessage message)->System.out.println(emailMessage.getMessageText()));
     }
 }

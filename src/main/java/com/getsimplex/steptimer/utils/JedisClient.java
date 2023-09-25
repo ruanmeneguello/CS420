@@ -236,6 +236,15 @@ public class JedisClient {
         return object;
     }
 
+    public static synchronized JSONArray jsonGetArray(String key, String path){
+        JSONArray arrayOfArrays =  (JSONArray) unifiedJedis.jsonGet(key,Path2.of(path));
+        JSONArray jsonArray = new JSONArray();
+        if(arrayOfArrays.length()>0){
+            jsonArray =(JSONArray) arrayOfArrays.get(0);// the first jsonArray
+        }
+        return jsonArray;
+    }
+
     public static synchronized void zadd(String key, long score, String value) throws Exception{
         Jedis jedis = jedisPool.getResource();
         try {
