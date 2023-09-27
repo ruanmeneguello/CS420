@@ -2,6 +2,7 @@
 
 package com.getsimplex.steptimer.service;
 
+import com.getsimplex.steptimer.datarepository.RapidStepTestRepository;
 import com.getsimplex.steptimer.model.*;
 import com.getsimplex.steptimer.utils.NotFoundException;
 import com.google.gson.Gson;
@@ -21,11 +22,14 @@ public class StepHistory {
     private static Logger logger = Logger.getLogger(StepHistory.class.getName());
     private static Gson gson = GsonFactory.getGson();
 
+    private static RapidStepTestRepository rapidStepTestRepository = new RapidStepTestRepository();
 
 
 
-    public static String getAllTests(String email) throws Exception{
-        List<RapidStepTest> rapidStepTests = JedisData.getEntitiesByIndex(RapidStepTest.class, "CustomerId",email);
+
+    public static String getAllTests(String phoneNumber) throws Exception{
+        //List<RapidStepTest> rapidStepTests = JedisData.getEntitiesByIndex(RapidStepTest.class, "CustomerId",email);
+        List<RapidStepTest> rapidStepTests = rapidStepTestRepository.getArrayAtKey(phoneNumber);
         return (gson.toJson(rapidStepTests));
     }
 
@@ -33,6 +37,7 @@ public class StepHistory {
         logger.info("Received score request for: "+email);
         Optional<Customer> customer = Optional.empty();
         User user = FindUser.getUserByUserName(email);
+
         if (user!=null) {
             customer = CustomerService.findCustomerByEmail(user.getPhone());
             if (!customer.isPresent()){
@@ -42,8 +47,8 @@ public class StepHistory {
             throw new Exception("Unable to locate user: "+email);
         }
 
-
-        List<RapidStepTest> rapidStepTestsSortedByDate = JedisData.getEntitiesByIndex(RapidStepTest.class,"CustomerId", email);
+        List<RapidStepTest> rapidStepTestsSortedByDate = rapidStepTestRepository.getArrayAtKey(user.getPhone());
+        //List<RapidStepTest> rapidStepTestsSortedByDate = JedisData.getEntitiesByIndex(RapidStepTest.class,"CustomerId", email);
         Collections.sort(rapidStepTestsSortedByDate);
         if (rapidStepTestsSortedByDate.size()<4){
             throw new NotFoundException("Customer "+email+" has: "+rapidStepTestsSortedByDate.size()+" rapid step tests on file which is less than the required number(4) to calculate fall risk.");

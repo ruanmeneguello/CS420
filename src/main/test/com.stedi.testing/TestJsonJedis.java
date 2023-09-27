@@ -1,5 +1,7 @@
 package com.stedi.testing;
 
+import com.getsimplex.steptimer.datarepository.CustomerRepository;
+import com.getsimplex.steptimer.datarepository.EmailMessageRepository;
 import com.getsimplex.steptimer.datarepository.GenericRepository;
 import com.getsimplex.steptimer.model.Customer;
 import com.getsimplex.steptimer.model.EmailMessage;
@@ -13,7 +15,7 @@ public class TestJsonJedis {
 
     public static void main (String[] args) throws Exception{
 
-        GenericRepository messageRepository = new GenericRepository<EmailMessage>();
+        CustomerRepository customerRepository = new CustomerRepository();
         //JedisClient jedisClient = new JedisClient();
 
         Customer customer = new Customer();
@@ -23,24 +25,24 @@ public class TestJsonJedis {
         customer.setGender("male");
         customer.setBirthDay("01/01/2001");
 
-        EmailMessage emailMessage = new EmailMessage();
-
-        emailMessage.setMessageText("Hi");
-        emailMessage.setName("John Doe");
-        emailMessage.setSubject("Test");
-        emailMessage.setToAddress("johndoe@gmail.com");
+//        EmailMessage emailMessage = new EmailMessage();
+//
+//        emailMessage.setMessageText("Hi");
+//        emailMessage.setName("John Doe");
+//        emailMessage.setSubject("Test");
+//        emailMessage.setToAddress("johndoe@gmail.com");
 
         //jedisClient.jsonArrayAdd("TestCustomersArray","$" ,customer);
 
-        messageRepository.addToArrayAtKey(emailMessage.getToAddress(),emailMessage);//we a
+        customerRepository.addToArrayAtKey("$",customer);//$ means we are adding to the root of a JSON object rather than a nested array
 
-        ArrayList<EmailMessage> emailsToJohn = messageRepository.getArrayAtKey("johndoe@gmail.com");
+        ArrayList<Customer> customers = customerRepository.getArrayAtKey("$");
 
 //        for(Object object:jsonArray){
 //            JSONObject jsonObject = (JSONObject) object;
 //            System.out.println(jsonObject.toString());
 //        }
 
-        emailsToJohn.forEach((EmailMessage message)->System.out.println(emailMessage.getMessageText()));
+        customers.forEach(eachCustomer->System.out.println(eachCustomer.getCustomerName()));
     }
 }
