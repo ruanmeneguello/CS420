@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 
 /**
@@ -48,6 +49,7 @@ public class StepHistory {
         }
 
         List<RapidStepTest> rapidStepTestsSortedByDate = rapidStepTestRepository.getArrayAtKey(user.getPhone());
+        rapidStepTestsSortedByDate = rapidStepTestsSortedByDate.stream().filter(rapidStepTest -> rapidStepTest.getStopTime()!=null && rapidStepTest.getStepPoints().size()==30 && rapidStepTest.getTestTime()!=null).collect(Collectors.toList());
         //List<RapidStepTest> rapidStepTestsSortedByDate = JedisData.getEntitiesByIndex(RapidStepTest.class,"CustomerId", email);
         Collections.sort(rapidStepTestsSortedByDate);
         if (rapidStepTestsSortedByDate.size()<4){
