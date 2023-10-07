@@ -2,6 +2,7 @@
 
 package com.getsimplex.steptimer.model;
 
+import io.netty.channel.Channel;
 import org.eclipse.jetty.websocket.api.Session;
 
 /**
@@ -9,9 +10,10 @@ import org.eclipse.jetty.websocket.api.Session;
  */
 public class DeviceInterestEnded {
 
-    Session interestedSession;
-    String interestedUser;
-    String deviceId;
+    Session interestedSession;//when the socket closes we don't know what user was connected, but we know what session was connected
+
+    Channel interestedChannel;//when the socket closes we don't know what user was connected, but we know what channel was connected
+
 
     public Session getInterestedSession() {
         return interestedSession;
@@ -21,19 +23,11 @@ public class DeviceInterestEnded {
         this.interestedSession = interestedSession;
     }
 
-    public String getInterestedUser() {
-        return interestedUser;
+    public Channel getInterestedChannel() {
+        return interestedChannel;
     }
 
-    public void setInterestedUser(String interestedUser) {
-        this.interestedUser = interestedUser;
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
+    public void setInterestedChannel(Channel interestedChannel) {
+        this.interestedChannel = interestedChannel;
     }
 }

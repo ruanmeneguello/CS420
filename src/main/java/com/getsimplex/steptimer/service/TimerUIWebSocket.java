@@ -26,9 +26,7 @@ public class TimerUIWebSocket {
     @OnWebSocketClose
     public void onClose(Session session, int code, String message){
         DeviceInterestEnded deviceInterestEnded = new DeviceInterestEnded();
-        deviceInterestEnded.setDeviceId(session.getRemoteAddress().getHostString());
         deviceInterestEnded.setInterestedSession(session);
-        deviceInterestEnded.setInterestedUser("clinicmanager");
         MessageIntake.route(deviceInterestEnded);// notify Device Actor of a closed session
     }
 

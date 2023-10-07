@@ -10,17 +10,13 @@
 
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.beerboy.ss</groupId>-->
-<!--            <artifactId>spark-swagger</artifactId>-->
-<!--            <version>1.0.0.48</version>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>com.fasterxml.jackson.core</groupId>-->
-<!--                    <artifactId>jackson-databind</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/io.netty/netty-all -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>4.1.36.Final</version>
+        </dependency>
+
         <dependency>
             <groupId>com.googlecode.libphonenumber</groupId>
             <artifactId>libphonenumber</artifactId>

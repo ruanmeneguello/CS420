@@ -50,9 +50,9 @@ public class DeviceWebSocketHandler {
 //        MessageIntake.route(sessionMessage);
 
         DeviceInterestEnded deviceInterestEnded = new DeviceInterestEnded();
-        deviceInterestEnded.setDeviceId("1234");
+//        deviceInterestEnded.setDeviceId("1234");//this is just for demonstration purposes, we can change this to an actual device ID
         deviceInterestEnded.setInterestedSession(session);
-        deviceInterestEnded.setInterestedUser("clinicmanager");
+//        deviceInterestEnded.setInterestedUser("clinicmanager");
         MessageIntake.route(deviceInterestEnded);// this should prevent trying to send updates to a closed socket
     }
 

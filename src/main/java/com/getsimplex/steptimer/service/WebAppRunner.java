@@ -7,6 +7,7 @@ package com.getsimplex.steptimer.service;
 
 
 import com.getsimplex.steptimer.model.*;
+import com.getsimplex.steptimer.tcp.NettyServerBootstrap;
 import com.getsimplex.steptimer.utils.*;
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
@@ -33,6 +34,16 @@ public class WebAppRunner {
     private static Gson gson = new Gson();
 
     private static Logger logger = Logger.getLogger(WebAppRunner.class.getName());
+
+    public static void startTCPSocket(){
+        try{
+            NettyServerBootstrap nettyServerBootStrap = new NettyServerBootstrap();
+            nettyServerBootStrap.start(54321);
+        } catch(InterruptedException exception){
+
+        }
+    }
+
     public static void main(String[] args){
 
         Spark.port(getHerokuAssignedPort());
@@ -295,6 +306,7 @@ public class WebAppRunner {
                     return "OK";
         });
         init();
+        startTCPSocket();
     }
     private static String twoFactorLogin(Request request, Response response){
         String phoneNumber =  request.params(":phoneNumber");
@@ -308,13 +320,7 @@ public class WebAppRunner {
                 String loginToken=TokenService.createUserTokenSpecificTimeout(user.getUserName(), expiration);
                 OneTimePassword oneTimePassword = new OneTimePassword();
                 oneTimePassword.setOneTimePassword(randomNum);
-                if (user.getEmail().equals("scmurdock@gmail,.com")){
-                    oneTimePassword.setExpirationDate(new Date(expiration));
-
-                } else{
-                    oneTimePassword.setExpirationDate(new Date(System.currentTimeMillis()+60l*30l*1000l));
-
-                }
+                oneTimePassword.setExpirationDate(new Date(System.currentTimeMillis()+60l*30l*1000l));//30 minute OTP expiration
                 oneTimePassword.setLoginToken(loginToken);
                 oneTimePassword.setPhoneNumber(phoneNumber);
                 OneTimePasswordService.saveOneTimePassword(oneTimePassword);

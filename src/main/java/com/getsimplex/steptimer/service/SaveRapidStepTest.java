@@ -5,6 +5,7 @@ package com.getsimplex.steptimer.service;
 import com.getsimplex.steptimer.datarepository.CustomerRepository;
 import com.getsimplex.steptimer.datarepository.RapidStepTestRepository;
 import com.getsimplex.steptimer.model.Customer;
+import com.getsimplex.steptimer.model.DeviceMessage;
 import com.getsimplex.steptimer.model.User;
 import com.getsimplex.steptimer.utils.JedisClient;
 import com.google.gson.Gson;
@@ -32,6 +33,11 @@ public class SaveRapidStepTest {
         // - the array for each phone number contains all the rapid step tests for the customer
         //- the array is in ascending order of the creation time of the test
 
+        DeviceMessage deviceMessage = new DeviceMessage();
+        deviceMessage.setDeviceId(user.getEmail());
+        deviceMessage.setMessage(rapidStepTestString);
+
+        MessageIntake.route(deviceMessage);
 
     }
 }

@@ -10,6 +10,7 @@ import com.getsimplex.steptimer.com.getsimplex.steptimer.sensormessages.SensorMe
 import com.getsimplex.steptimer.model.DeviceInterest;
 import com.getsimplex.steptimer.model.DeviceInterestEnded;
 import com.getsimplex.steptimer.model.DeviceMessage;
+import io.netty.channel.Channel;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.util.HashMap;
@@ -22,9 +23,10 @@ import java.util.logging.Logger;
  */
 public class DeviceRouter extends UntypedActor {
     private static Logger logger = Logger.getLogger(DeviceRouter.class.getName());
-    private static HashMap<String, Session> deviceRegistry = new HashMap<String, Session>();//this is for the websocket to show the user the activity for the unique device
-    private static HashMap<String,ActorRef> uniqueDeviceListeners = new HashMap<String, ActorRef>();
-    private long lastMessageDate = 0l;	
+    private static HashMap<String, DeviceInterest> deviceRegistry = new HashMap<>();//this is for the websocket to show the user the activity for the unique device
+    private static HashMap<Channel, DeviceInterest> channelRegistry = new HashMap<>();//if a channel is disconnected, we can find the device to remove it from the list
+    private static HashMap<Session, DeviceInterest> sessionRegistry = new HashMap<>();//if a session is disconnected, we can find the device to remove it from the list
+
 
     public void onReceive(Object object){
         if (object instanceof DeviceMessage) {
@@ -32,54 +34,44 @@ public class DeviceRouter extends UntypedActor {
             logger.info("DeviceRouter received payload: "+deviceMessage.getMessage()+" with timestamp: "+deviceMessage.getDate());
             try {
                 if (deviceRegistry.containsKey(deviceMessage.getDeviceId())){
-                    deviceRegistry.get(deviceMessage.getDeviceId()).getRemote().sendString(deviceMessage.getMessage());
+                    if (deviceRegistry.get(deviceMessage.getDeviceId()).getInterestedSession()!=null) {
+                        deviceRegistry.get(deviceMessage.getDeviceId()).getInterestedSession().getRemote().sendString(deviceMessage.getMessage());//web socket
+                    } else if (deviceRegistry.get(deviceMessage.getDeviceId()).getInterestedChannel()!=null){
+                        deviceRegistry.get((deviceMessage.getDeviceId())).getInterestedChannel().writeAndFlush(deviceMessage.getMessage());//tcp socket
+                    }
                 }
             } catch (Exception e){
                 logger.severe("Unable to transmit to socket message: "+deviceMessage.getMessage()+ "due to: "+e.getMessage());
             }
-	    lastMessageDate = deviceMessage.getDate();//update it	
 
         } else if (object instanceof DeviceInterest){
             DeviceInterest deviceInterest = (DeviceInterest) object;
             if(!deviceRegistry.containsKey(deviceInterest.getDeviceId())){
-                deviceRegistry.put(deviceInterest.getDeviceId(),deviceInterest.getInterestedSession());
+                deviceRegistry.put(deviceInterest.getDeviceId(),deviceInterest);
             } else {
-                deviceRegistry.get(deviceInterest.getDeviceId()).close();//we are moving to a different subscriber
+                deviceRegistry.get(deviceInterest.getDeviceId()).getInterestedSession().close();//we are moving to a different subscriber
                 logger.info("Device: "+deviceInterest.getDeviceId()+" is already being monitored.");
                 logger.info("Moving interest in Device: "+deviceInterest.getDeviceId()+"  as per latest request.");
-                deviceRegistry.put(deviceInterest.getDeviceId(),deviceInterest.getInterestedSession());
+                deviceRegistry.put(deviceInterest.getDeviceId(),deviceInterest);
             }
         } else if (object instanceof DeviceInterestEnded){
             DeviceInterestEnded deviceInterestEnded = (DeviceInterestEnded) object;
-            if (deviceRegistry.containsKey(deviceInterestEnded.getDeviceId())){
-                deviceRegistry.remove(deviceInterestEnded.getDeviceId());
-            } else if (deviceRegistry.containsValue(deviceInterestEnded.getInterestedSession())){
-                removeRegistryValue(deviceInterestEnded.getInterestedSession());
+            if (deviceInterestEnded.getInterestedChannel()!=null && channelRegistry.containsKey(deviceInterestEnded.getInterestedChannel())){
+                DeviceInterest deviceInterest = channelRegistry.get(deviceInterestEnded.getInterestedChannel());//device Id could be an email or another identifier
+                channelRegistry.remove(deviceInterestEnded.getInterestedChannel());//lookup device by channel
+
+                deviceRegistry.remove(deviceInterest.getDeviceId());//remove from further notifications
+
+            } else if (deviceInterestEnded.getInterestedSession()!=null && sessionRegistry.containsKey(deviceInterestEnded.getInterestedSession())){
+                DeviceInterest deviceInterest = sessionRegistry.get(deviceInterestEnded.getInterestedSession());
+
+                sessionRegistry.remove(deviceInterestEnded.getInterestedSession());//lookup device by session
+
+                deviceRegistry.remove(deviceInterest.getDeviceId());//remove from further notifications
             }
         }
 
 
     }
 
-    private void removeRegistryValue(Session session){
-        Set<Map.Entry<String,Session>> registryEntries = deviceRegistry.entrySet();
-
-        for (Map.Entry<String,Session> registryEntry:registryEntries){
-            if (session.equals(registryEntry.getValue())){
-                deviceRegistry.remove(registryEntry.getKey());
-            }
-        }
-    }
-
-    ActorRef getDeviceListener(String deviceId){
-        ActorRef deviceListener;
-        if(uniqueDeviceListeners.containsKey(deviceId)){
-            deviceListener = uniqueDeviceListeners.get(deviceId);
-        } else {
-            deviceListener = context().actorOf(Props.create(Device.class), deviceId);
-            uniqueDeviceListeners.put(deviceId, deviceListener);
-        }
-
-        return deviceListener;
-    }
 }
