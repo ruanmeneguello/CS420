@@ -65,14 +65,15 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: stedi-prod-service
+  name: stedi-tcp-prod
 spec:
   selector:
     app: stedi-prod
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 4567
+      port: 54321
+      targetPort: 54321
+  type: LoadBalancer
 
 ---
 apiVersion: v1

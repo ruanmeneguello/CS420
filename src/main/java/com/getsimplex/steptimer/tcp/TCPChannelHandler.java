@@ -36,7 +36,6 @@ public class TCPChannelHandler extends SimpleChannelInboundHandler<String> {
                 Utils.log(ctx.channel().remoteAddress(),"Unable to subscribe to: "+email+" due to invalid token or mismatched email: "+tokenEmail);
             }
         }
-        ctx.channel().writeAndFlush("Thanks\n");
     }
 
     @Override
