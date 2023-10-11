@@ -38,6 +38,8 @@ public class DeviceRouter extends UntypedActor {
                         deviceRegistry.get(deviceMessage.getDeviceId()).getInterestedSession().getRemote().sendString(deviceMessage.getMessage());//web socket
                     } else if (deviceRegistry.get(deviceMessage.getDeviceId()).getInterestedChannel()!=null){
                         deviceRegistry.get((deviceMessage.getDeviceId())).getInterestedChannel().writeAndFlush(deviceMessage.getMessage());//tcp socket
+                    } else{
+                        logger.severe("Unable to find a channel or a session for device ID: "+deviceMessage.getDeviceId());
                     }
                 }
             } catch (Exception e){
