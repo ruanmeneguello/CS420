@@ -51,9 +51,17 @@ public class DeviceRouter extends UntypedActor {
             if(!deviceRegistry.containsKey(deviceInterest.getDeviceId())){
                 deviceRegistry.put(deviceInterest.getDeviceId(),deviceInterest);
             } else {
-                deviceRegistry.get(deviceInterest.getDeviceId()).getInterestedSession().close();//we are moving to a different subscriber
-                logger.info("Device: "+deviceInterest.getDeviceId()+" is already being monitored.");
-                logger.info("Moving interest in Device: "+deviceInterest.getDeviceId()+"  as per latest request.");
+                DeviceInterest existingDeviceInterest = deviceRegistry.get(deviceInterest.getDeviceId());
+                //Websocket
+                if(existingDeviceInterest.getInterestedSession()!=null && existingDeviceInterest.getInterestedSession().isOpen()){
+                    existingDeviceInterest.getInterestedSession().close();//we are moving to a different subscriber
+                }
+                //TCP Socket
+                else if (deviceInterest.getInterestedChannel()!=null && existingDeviceInterest.getInterestedChannel().isActive()){
+                    existingDeviceInterest.getInterestedChannel().close();//we are moving to a different subscriber
+                }
+                logger.info("Device: "+deviceInterest.getDeviceId()+" was already being monitored on a socket.");
+                logger.info("Moving interest in Device: "+deviceInterest.getDeviceId()+" to a new socket  as per latest request.");
                 deviceRegistry.put(deviceInterest.getDeviceId(),deviceInterest);
             }
         } else if (object instanceof DeviceInterestEnded){
