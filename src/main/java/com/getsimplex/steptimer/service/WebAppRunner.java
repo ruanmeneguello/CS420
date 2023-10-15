@@ -114,7 +114,13 @@ public class WebAppRunner {
 
             return response;
         });
-        get("/validate/:token", (req,res)->SessionValidator.emailFromToken(req.params(":token")));
+        get("/validate/:token", (req,res)->{
+            String emailAddress = SessionValidator.emailFromToken(req.params(":token"));
+            if(emailAddress.isEmpty() || emailAddress==null){
+                res.status(401);
+            }
+            return emailAddress;
+        });
         post("/sendtext",(req,res)->{//this url is for the DevOps class at BYUI so they can deploy STEDI and not need Twilio Credentials
             //It only allows them to log in with their own user as long as it exits in the dev.stedi.me application
             Gson gson = new Gson();
