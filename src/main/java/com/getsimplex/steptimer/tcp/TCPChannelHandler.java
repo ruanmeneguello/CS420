@@ -11,6 +11,7 @@ public class TCPChannelHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         Utils.log(ctx.channel().remoteAddress(), "Channel Active");
+        ctx.channel().writeAndFlush("congratulations - you are connected");
     }
 
     @Override
