@@ -23,9 +23,8 @@ public class TCPChannelHandler extends SimpleChannelInboundHandler<String> {
             String token = messageParts[0];
             String tokenEmail = SessionValidator.emailFromToken(token);
             String email = messageParts[1];
-            if (email.contains("\r\n")){
-                email = email.split("\r\n")[0];//get rid of carriage return line feed from testing
-            }
+            email=email.replaceAll("\r","");
+            email=email.replaceAll("\n","");
             if (!tokenEmail.isEmpty() && tokenEmail.equals(email)){
                 Utils.log(ctx.channel().remoteAddress(),"Socket subscribing to updates for :"+email);
                 DeviceInterest deviceInterest = new DeviceInterest();

@@ -257,12 +257,12 @@ public class WebAppRunner {
                     saveStepSession(req);
                     returnBody= "Saved";
                 } else{
-                    res.status(400);
-                    returnBody= "Error locating customer";
+                    res.status(401);
+                    returnBody= "Error authenticating user";
                 }
 
             } catch (Exception e){
-                res.status(401);
+                res.status(500);
             }
             return returnBody;
         });
