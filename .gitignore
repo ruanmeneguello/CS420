@@ -8,4 +8,4 @@ dump.rdb
 .classpath
 .project
 bin
-
+.DS_Store
