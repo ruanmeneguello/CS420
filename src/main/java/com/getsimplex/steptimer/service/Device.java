@@ -1,4 +1,4 @@
-//© 2021 Sean Murdock
+//Copyright 2021 Sean Murdock
 
 package com.getsimplex.steptimer.service;
 

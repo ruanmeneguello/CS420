@@ -1,4 +1,4 @@
-//© 2021 Sean Murdock
+//Copyright 2021 Sean Murdock
 
 package com.getsimplex.steptimer.service;
 
@@ -26,7 +26,7 @@ public class LoginController {
     public static String handleRequest(Request request) throws Exception{
         String loginRequestString = request.body();
         LoginRequest loginRequest = gson.fromJson(loginRequestString, LoginRequest.class);
-        return tryLogin(loginRequest.getUserName(), loginRequest.getPassword());
+        return tryLogin(loginRequest.getUserName().toLowerCase(), loginRequest.getPassword());
 
     }
 

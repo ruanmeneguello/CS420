@@ -1,7 +1,7 @@
 package com.getsimplex.steptimer.service;
 
 /**
- © 2021 Sean Murdock
+ Copyright 2021 Sean Murdock
  * Created by sean on 8/10/2016 based on https://github.com/tipsy/spark-websocket/tree/master/src/main/java
  */
 
@@ -257,12 +257,12 @@ public class WebAppRunner {
                     saveStepSession(req);
                     returnBody= "Saved";
                 } else{
-                    res.status(400);
-                    returnBody= "Error locating customer";
+                    res.status(401);
+                    returnBody= "Error authenticating user";
                 }
 
             } catch (Exception e){
-                res.status(401);
+                res.status(500);
             }
             return returnBody;
         });
