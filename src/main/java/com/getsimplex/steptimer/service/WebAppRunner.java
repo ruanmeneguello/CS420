@@ -9,20 +9,14 @@ package com.getsimplex.steptimer.service;
 import com.getsimplex.steptimer.model.*;
 import com.getsimplex.steptimer.tcp.NettyServerBootstrap;
 import com.getsimplex.steptimer.utils.*;
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.w3c.dom.Text;
 import spark.Filter;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.logging.Logger;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -58,6 +52,7 @@ public class WebAppRunner {
             response.header("Access-Control-Allow-Credentials", "true");
         });
         post("/contact", (req, res)->{
+            userFilter(req,res);
             try {
                 EmailMessage emailMessage = gson.fromJson(req.body(), EmailMessage.class);
                 SendGmail.send(emailMessage.getToAddress(), emailMessage.getMessageText(), emailMessage.getSubject(), emailMessage.getName());
@@ -150,8 +145,10 @@ public class WebAppRunner {
             return validPassword;
         });
         delete("/user/:username", (req,res)->{
-           userFilter(req,res);
-           CreateNewUser.deleteUser(req.params("username"));
+           Optional<User> loggedInUser = userFilter(req,res);
+           if (loggedInUser.get().getEmail().equals("scmurdock@gmail.com")) {//only allow admins to delete users
+               CreateNewUser.deleteUser(req.params("username"));
+           }
            return "deleted user";
         });
         get ("/stephistory/:customer", (req, res)-> {
@@ -163,6 +160,7 @@ public class WebAppRunner {
             return StepHistory.getAllTests(req.params(":customer"));
         });
         post("/customer", (req, res)-> {
+            userFilter(req,res);//new users receive a login token before their customer profile is created, so we filter this request
             String response;
             try {
                 createNewCustomer(req, res);
@@ -186,7 +184,36 @@ public class WebAppRunner {
             return response;
         });
 
+        patch("/customer/lastwalkerdate/:customerPhone/:days", (req,res) ->{
+            userFilter(req,res);//new users receive a login token before their customer profile is created, so we filter this request
+            Customer customer = CustomerService.getCustomerByPhone(req.params(":customerPhone"));//get existing customer from database
+            if (customer != null) {
+                int days = Integer.parseInt(req.params(":days"));
+
+                // Calculate the new lastWalkerDate based on the user's input
+                long currentTimeMillis = System.currentTimeMillis();
+                long daysInMillis = days * 24 * 60 * 60 * 1000L; // Convert days to milliseconds
+                long newLastWalkerDateMillis = currentTimeMillis - daysInMillis;
+
+                // Update the lastWalkerDate of the customer
+                customer.setLastWalkerDate(new Date(newLastWalkerDateMillis));
+
+                // Assuming you have a method to update the customer in your service
+                // You need to implement this method if not already implemented
+                CustomerService.createOrUpdateCustomer(customer, true);
+
+                res.status(200);
+                return "Last walker date updated successfully";
+            } else {
+                res.status(404); // Customer not found
+                return "Customer not found";
+            }
+
+        });
+
         put("/customer", (req, res)-> {
+            userFilter(req,res);//new users receive a login token before their customer profile is created, so we filter this request
+
             String response;
             try {
                 updateCustomer(req, res);
@@ -211,7 +238,9 @@ public class WebAppRunner {
         });
 
         get("/customer/:phone", (req, res)-> {
-          String phone =  req.params(":phone");
+            userFilter(req,res);//new users receive a login token before their customer profile is created, so we filter this request
+
+            String phone =  req.params(":phone");
             Optional<User> optionalUser = Optional.empty();
             try {
               optionalUser = userFilter(req, res);

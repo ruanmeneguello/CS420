@@ -2,6 +2,8 @@
 
 package com.getsimplex.steptimer.model;
 
+import java.util.Date;
+
 /**
  * Created by sean on 9/7/2016.
  */
@@ -11,6 +13,8 @@ public class Customer {
     private String email;
     private String phone;
     private String birthDay;
+
+    private Date lastWalkerDate;
 
     private String gender;
     public String getCustomerName() {
@@ -51,4 +55,11 @@ public class Customer {
         this.gender = gender;
     }
 
+    public Date getLastWalkerDate() {
+        return lastWalkerDate;
+    }
+
+    public void setLastWalkerDate(Date lastWalkerDate) {
+        this.lastWalkerDate = lastWalkerDate;
+    }
 }

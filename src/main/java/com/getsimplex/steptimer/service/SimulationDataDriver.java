@@ -52,7 +52,7 @@ public class SimulationDataDriver {
                 customer.setEmail(firstName + "." + lastName + "@test.com");
                 customer.setPhone("8015551212");
                 customer.setBirthDay((2020-nextCustomerAge++)+"-01-01");//spread age out evenly
-                CustomerService.createCustomer(customer,false);
+                CustomerService.createOrUpdateCustomer(customer,false);
                 testCustomers.add(customer);
             } catch (Exception e) {
                 System.out.println(e.getMessage());

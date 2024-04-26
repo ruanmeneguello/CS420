@@ -26,7 +26,7 @@ public class CustomerService {
         String newCustomerRequest = request.body();
         Customer newCustomer = gson.fromJson(newCustomerRequest, Customer.class);
 
-        return createCustomer(newCustomer, update);
+        return createOrUpdateCustomer(newCustomer, update);
 
     }
     public static Customer getCustomerByPhone(String phoneNumber) throws Exception{
@@ -43,7 +43,7 @@ public class CustomerService {
         return customers.get(0);
 
     }
-    public static String createCustomer(Customer newCustomer, boolean update) throws Exception{
+    public static String createOrUpdateCustomer(Customer newCustomer, boolean update) throws Exception{
         String phone = SendText.getFormattedPhone(newCustomer.getPhone());//ex: 801-719-0908 becomes: +18017190908
         newCustomer.setPhone(phone);
         String numericDigitsOnly = phone.replaceAll("[^0-9]","");

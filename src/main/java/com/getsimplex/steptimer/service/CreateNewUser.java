@@ -102,8 +102,7 @@ public class CreateNewUser {
         //SAVE USER TO REDIS
         JedisData.loadToJedis(addUser, addUser.getUserName(), Long.valueOf(standardizedPhoneDigitsOnly));
 
-        return "Welcome: " + addUser.getUserName() + " Your account has been created, please login.";
-
+        return TokenService.createUserToken(addUser.getUserName());
     }
 
     // code borrowed from http://www.java2novice.com/java-collections-and-util/regex/valid-password/

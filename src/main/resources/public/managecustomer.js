@@ -121,8 +121,8 @@ function createcustomer(){
             agreedToTextMessageDate: new Date().getTime()
 
         }),//we are using the email as the user name
-        success: function(data) {
-            createCustomer(data);
+        success: function(loginToken) {
+            createCustomer(loginToken);
         },
         error: function(xhr){
             console.log(JSON.stringify(xhr))
@@ -139,7 +139,7 @@ function createcustomer(){
 
 }
 
-const createCustomer = (createUserResponse)=>{
+const createCustomer = (loginToken)=>{
 
     const customer = {
         customerName : customerName,
@@ -154,9 +154,12 @@ const createCustomer = (createUserResponse)=>{
         data: JSON.stringify(customer),
         contentType: 'application/text',
         dataType: 'text',
+        headers:{
+            "suresteps.session.token":loginToken
+        },
         success: function (data) {
             localStorage.setItem("customer", JSON.stringify(customer));
-            alert(createUserResponse);
+            alert("Successfully created user, please login to get started.");
             window.location.href = "/index.html"
         },
         error: function (xhr) {
