@@ -41,6 +41,7 @@ public class WebAppRunner {
     public static void main(String[] args){
 
         Spark.port(getHerokuAssignedPort());
+
         staticFileLocation("/public");
         webSocket("/socket", DeviceWebSocketHandler.class);
         webSocket("/timeruiwebsocket", TimerUIWebSocket.class);
@@ -81,6 +82,8 @@ public class WebAppRunner {
                 res.status(500);
                 System.out.println("Error creating user");
             }
+            res.type("application/json");
+            res.body(response);
             return response;
         }
             );
@@ -114,9 +117,12 @@ public class WebAppRunner {
             if(emailAddress.isEmpty() || emailAddress==null){
                 res.status(401);
             }
+            res.body(emailAddress);
+            res.type("application/json");
             return emailAddress;
         });
         post("/sendtext",(req,res)->{//this url is for the DevOps class at BYUI so they can deploy STEDI and not need Twilio Credentials
+            res.type("application/json");
             //It only allows them to log in with their own user as long as it exits in the dev.stedi.me application
             Gson gson = new Gson();
             TextMessage textMessage = gson.fromJson(req.body(), TextMessage.class);//
@@ -134,6 +140,7 @@ public class WebAppRunner {
         post("/simulation", (req, res)-> MessageIntake.route(new StartSimulation(30)));
         delete("/simulation", (req, res)-> MessageIntake.route(new StopSimulation()));
         post("/complexity", (req,res)->{
+            res.type("application/json");
             Gson gson = new Gson();
             Boolean validPassword = CreateNewUser.validatePassword(gson.fromJson(req.body(), User.class).getPassword());
 
@@ -152,12 +159,15 @@ public class WebAppRunner {
            return "deleted user";
         });
         get ("/stephistory/:customer", (req, res)-> {
+            res.type("application/json");
             try{
                 userFilter(req, res);
             } catch (Exception e){
                 res.redirect("/");
             }
-            return StepHistory.getAllTests(req.params(":customer"));
+            String allTests = StepHistory.getAllTests(req.params(":customer"));
+            res.body(allTests);
+            return allTests;
         });
         post("/customer", (req, res)-> {
             userFilter(req,res);//new users receive a login token before their customer profile is created, so we filter this request
@@ -181,6 +191,8 @@ public class WebAppRunner {
                 res.status(500);
                 response="Error creating customer";
             }
+            res.type("application/json");
+            res.body(response);
             return response;
         });
 
@@ -201,9 +213,10 @@ public class WebAppRunner {
                 // Assuming you have a method to update the customer in your service
                 // You need to implement this method if not already implemented
                 CustomerService.createOrUpdateCustomer(customer, true);
-
+                res.type("application/json");
+                res.body(gson.toJson(customer));
                 res.status(200);
-                return "Last walker date updated successfully";
+                return gson.toJson(customer);
             } else {
                 res.status(404); // Customer not found
                 return "Customer not found";
@@ -234,12 +247,14 @@ public class WebAppRunner {
                 res.status(500);
                 response="Error creating customer";
             }
+            res.type("application/json");
+            res.body(response);
             return response;
         });
 
         get("/customer/:phone", (req, res)-> {
             userFilter(req,res);//new users receive a login token before their customer profile is created, so we filter this request
-
+            res.type("application/json");
             String phone =  req.params(":phone");
             Optional<User> optionalUser = Optional.empty();
             try {
@@ -251,7 +266,10 @@ public class WebAppRunner {
                 return null;
             }
             if(optionalUser.isPresent() && optionalUser.get().getPhone().equals( SendText.getFormattedPhone(phone))){
-                return gson.toJson(CustomerService.getCustomerByPhone(phone));
+                String customerJson =gson.toJson(CustomerService.getCustomerByPhone(phone));
+                res.type("application/json");
+                res.body(customerJson);
+                return customerJson;
             }
             return  null;
         });
@@ -318,6 +336,8 @@ public class WebAppRunner {
                     res.status(400);
                 }
             }
+            res.type("application/json");
+            res.body(returnBody);
             return returnBody;
         }));
 
