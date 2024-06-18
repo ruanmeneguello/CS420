@@ -24,8 +24,12 @@
         <input class="stepcount" type="email" id="email" name="email" size="50" onchange="setemail()">
     </p>
     <p>
-        <label class="stepcount" for="newUser"><span>*</span> Cell Phone Number (used for sending One Time Passwords - reply STOP to opt out): </label><br>
+        <label class="stepcount" for="newUser"><span>*</span> Option 1: Cell Phone Number (used for sending One Time Passwords - reply STOP to opt out): </label><br>
         <input class="stepcount" type="tel" id="phone" name="phone" size="12" onchange="setphone()" required>
+    </p>
+    <p>
+        <label class="stepcount" for="newUser"><span>*</span> Option 2: WhatsApp Phone Number (used for sending One Time Passwords and customer alerts - reply STOP to opt out): </label><br>
+        <input class="stepcount" type="tel" id="whatsappphone" name="whatsappphone" size="12" onchange="setwhatsappphone()" required>
     </p>
     <p>
         <label class="stepcount" for="newUser"><span>*</span> Birthday: </label><br>

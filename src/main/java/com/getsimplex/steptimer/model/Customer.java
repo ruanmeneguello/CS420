@@ -12,6 +12,7 @@ public class Customer {
     private String customerName;
     private String email;
     private String phone;
+    private String whatsAppPhone;
     private String birthDay;
 
     private Date lastWalkerDate;
@@ -41,6 +42,13 @@ public class Customer {
         this.phone = phone;
     }
 
+    public String getWhatsAppPhone() {
+        return whatsAppPhone;
+    }
+
+    public void setWhatsAppPhone(String whatsAppPhone) {
+        this.whatsAppPhone = whatsAppPhone;
+    }
 
     public String getBirthDay() {
         return birthDay;

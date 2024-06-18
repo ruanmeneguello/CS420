@@ -44,8 +44,14 @@ public class CustomerService {
 
     }
     public static String createOrUpdateCustomer(Customer newCustomer, boolean update) throws Exception{
+        if(newCustomer.getPhone().isEmpty() && !newCustomer.getWhatsAppPhone().isEmpty()){
+            newCustomer.setPhone(newCustomer.getWhatsAppPhone());
+        }
         String phone = SendText.getFormattedPhone(newCustomer.getPhone());//ex: 801-719-0908 becomes: +18017190908
         newCustomer.setPhone(phone);
+        String whatsAppPhone = SendText.getFormattedPhone(newCustomer.getWhatsAppPhone());//ex: 801-719-0908 becomes: +18017190908
+        newCustomer.setWhatsAppPhone(whatsAppPhone);
+
         String numericDigitsOnly = phone.replaceAll("[^0-9]","");
         ArrayList<Customer> matchingCustomers = JedisData.getEntitiesByScore(Customer.class, Long.valueOf(numericDigitsOnly), Long.valueOf(numericDigitsOnly));
         Optional<Customer> matchingCustomer = JedisData.getEntityById(Customer.class, newCustomer.getPhone());
@@ -53,11 +59,11 @@ public class CustomerService {
             throw new AlreadyExistsException("Customer already exists");
         }
 
-        if (newCustomer != null && !newCustomer.getCustomerName().isEmpty() && !newCustomer.getPhone().isEmpty()) {
+        if (newCustomer != null && !newCustomer.getCustomerName().isEmpty() && (!newCustomer.getPhone().isEmpty() || !newCustomer.getWhatsAppPhone().isEmpty())) {
             //SAVE USER TO REDIS
             JedisData.loadToJedis(newCustomer, newCustomer.getPhone(), Long.valueOf(numericDigitsOnly));
         } else{
-            throw new Exception("Customer must have a non-empty name and phone");
+            throw new Exception("Customer must have a non-empty name and provide a cell or WhatsApp phone");
         }
         return "Welcome: " + newCustomer.getCustomerName();
     }

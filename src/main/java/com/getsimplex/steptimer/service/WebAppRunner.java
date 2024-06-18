@@ -29,6 +29,12 @@ public class WebAppRunner {
 
     private static Logger logger = Logger.getLogger(WebAppRunner.class.getName());
 
+    private static String CONTENT_SID= "";
+
+    static{
+        CONTENT_SID = System.getenv("TWILIO_OTP_MESSAGE_SID");
+    }
+
     public static void startTCPSocket(){
         try{
             NettyServerBootstrap nettyServerBootStrap = new NettyServerBootstrap();
@@ -365,6 +371,7 @@ public class WebAppRunner {
     }
     private static String twoFactorLogin(Request request, Response response){
         String phoneNumber =  request.params(":phoneNumber");
+        Boolean whatsApp = Boolean.valueOf(request.queryParams("whatsApp"));
         int randomNum = ThreadLocalRandom.current().nextInt(1111, 10000);
         User user=null;
         try {
@@ -380,7 +387,12 @@ public class WebAppRunner {
                 oneTimePassword.setPhoneNumber(phoneNumber);
                 OneTimePasswordService.saveOneTimePassword(oneTimePassword);
 
-                SendText.send(phoneNumber, "Your STEDI one-time password is : "+String.valueOf(randomNum));
+                if(whatsApp && !user.getWhatsAppPhone().isEmpty()){
+                    SendWhatsApp.send(phoneNumber, CONTENT_SID, String.valueOf(randomNum));
+                }
+                else{
+                    SendText.send(phoneNumber, "Your STEDI one-time password is : "+String.valueOf(randomNum));
+                }
                 response.status(200);
 
             } else{

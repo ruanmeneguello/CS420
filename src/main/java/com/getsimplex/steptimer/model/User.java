@@ -16,6 +16,7 @@ public class User {
     private String verifyPassword;
     private String email;
     private String phone;
+    private String whatsAppPhone;
     private String  birthDate;
     private String deviceNickName;
     private boolean locked;
@@ -66,6 +67,14 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getWhatsAppPhone() {
+        return whatsAppPhone;
+    }
+
+    public void setWhatsAppPhone(String whatsAppPhone) {
+        this.whatsAppPhone = whatsAppPhone;
     }
 
     public String getBirthDate() {

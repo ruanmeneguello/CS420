@@ -35,6 +35,10 @@ public class CreateNewUser {
         JedisData.getFromRedisMap(userName, User.class);
     }
     public static String createUser(User createUser) throws Exception{
+        if(createUser.getPhone().isEmpty() && !createUser.getWhatsAppPhone().isEmpty()){
+            createUser.setPhone(createUser.getWhatsAppPhone());
+        }
+
         User addUser = new User();
 
         addUser.setLocked(false);//new users start off with a clean slate
@@ -43,7 +47,7 @@ public class CreateNewUser {
         String password = createUser.getPassword();
         String verifyPassword = createUser.getVerifyPassword();
         String email = createUser.getEmail();
-        String phone = SendText.getFormattedPhone(createUser.getPhone());
+        String phone = !createUser.getPhone().isEmpty() ?SendText.getFormattedPhone(createUser.getPhone()):null;
         String standardizedPhoneDigitsOnly= phone.replaceAll("[^0-9]","");
         String bday = createUser.getBirthDate();
         String deviceId = createUser.getDeviceNickName();
@@ -82,6 +86,10 @@ public class CreateNewUser {
             addUser.setPhone(phone);
         }
 
+        if(createUser.getWhatsAppPhone() != null && !createUser.getWhatsAppPhone().isEmpty()){
+            String whatsAppPhone = SendText.getFormattedPhone(createUser.getWhatsAppPhone());
+            addUser.setWhatsAppPhone(whatsAppPhone);
+        }
 
         if (bday != null ){
             String birthdate = bday;

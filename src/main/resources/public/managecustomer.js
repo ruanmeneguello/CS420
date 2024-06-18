@@ -2,6 +2,7 @@
 
 let customerName = "";
 let phone = "";
+let whatsAppPhone="";
 let bday = "";
 let form = "";
 let elements = "";
@@ -44,6 +45,10 @@ function setemail(){
 
 function setphone(){
     phone = $("#phone").val().replace(/\D+/g, "");
+}
+
+function setwhatsappphone(){
+    whatsAppPhone = $("#whatsappphone").val().replace(/\D+/g, "");
 }
 
 function setbday(){
@@ -118,7 +123,8 @@ function createcustomer(){
             agreedToTermsOfUseDate: new Date().getTime(),
             agreedToCookiePolicyDate: new Date().getTime(),
             agreedToPrivacyPolicyDate: new Date().getTime(),
-            agreedToTextMessageDate: new Date().getTime()
+            agreedToTextMessageDate: new Date().getTime(),
+            whatsAppPhone
 
         }),//we are using the email as the user name
         success: function(loginToken) {
@@ -145,7 +151,8 @@ const createCustomer = (loginToken)=>{
         customerName : customerName,
         email : email,
         phone : phone,
-        birthDay: bday
+        birthDay: bday,
+        whatsAppPhone
     }
 
     $.ajax({

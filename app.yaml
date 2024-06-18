@@ -60,6 +60,10 @@ spec:
                   key: twilio_token
             - name: TWILIO_PHONE
               value: "+17146778438"
+            - name: TWILIO_SECTOR_MESSAGE_SID
+              value: HX5350683922e94938e46721bda849ae42
+            - name: TWILIO_OTP_MESSAGE_SID
+              value: HX6ff75f1bb3d8d34962f20121cd369c18
 # The ports is a list of tcp ports the pod listens on
           ports:
 # ContainerPort is a specific port the pod listens on
