@@ -3,6 +3,7 @@
 package com.getsimplex.steptimer.service;
 
 import com.getsimplex.steptimer.model.Customer;
+import com.getsimplex.steptimer.model.User;
 import com.getsimplex.steptimer.utils.AlreadyExistsException;
 import com.getsimplex.steptimer.utils.JedisClient;
 import com.getsimplex.steptimer.utils.JedisData;
@@ -43,6 +44,11 @@ public class CustomerService {
         return customers.get(0);
 
     }
+
+    public static void deleteCustomer(String phoneNumber) throws Exception{
+        JedisData.deleteJedis(Customer.class, phoneNumber);
+    }
+
     public static String createOrUpdateCustomer(Customer newCustomer, boolean update) throws Exception{
         if(newCustomer.getPhone().isEmpty() && !newCustomer.getWhatsAppPhone().isEmpty()){
             newCustomer.setPhone(newCustomer.getWhatsAppPhone());

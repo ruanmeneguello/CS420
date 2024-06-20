@@ -171,6 +171,7 @@ public class WebAppRunner {
            Optional<User> loggedInUser = userFilter(req,res);
            if (loggedInUser.get().getEmail().equals("scmurdock@gmail.com")) {//only allow admins to delete users
                CreateNewUser.deleteUser(req.params("username"));
+               CustomerService.deleteCustomer(loggedInUser.get().getPhone());
            }
            return "deleted user";
         });
