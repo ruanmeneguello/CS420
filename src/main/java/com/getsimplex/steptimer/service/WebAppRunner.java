@@ -29,10 +29,12 @@ public class WebAppRunner {
 
     private static Logger logger = Logger.getLogger(WebAppRunner.class.getName());
 
-    private static String CONTENT_SID= "";
+    private static String TWILIO_OTP_MESSAGE_SID = "";
+    private static String TWILIO_SECTOR_MESSAGE_SID;
 
     static{
-        CONTENT_SID = System.getenv("TWILIO_OTP_MESSAGE_SID");
+        TWILIO_OTP_MESSAGE_SID = System.getenv("TWILIO_OTP_MESSAGE_SID");
+        TWILIO_SECTOR_MESSAGE_SID = System.getenv("TWILIO_SECTOR_MESSAGE_SID");
     }
 
     public static void startTCPSocket(){
@@ -128,15 +130,23 @@ public class WebAppRunner {
             return emailAddress;
         });
         post("/sendtext",(req,res)->{//this url is for the DevOps class at BYUI so they can deploy STEDI and not need Twilio Credentials
+            Boolean whatsApp = Boolean.valueOf(req.queryParams("whatsApp"));
             res.type("application/json");
             //It only allows them to log in with their own user as long as it exits in the dev.stedi.me application
             Gson gson = new Gson();
             TextMessage textMessage = gson.fromJson(req.body(), TextMessage.class);//
             Optional<User> userOptional = userFilter(req,res);
             if (!userOptional.isEmpty() && userOptional.get().getPhone().equals(SendText.getFormattedPhone(textMessage.getPhoneNumber()))) {
-                SendText.send(textMessage.getPhoneNumber(), textMessage.getMessage());
-                res.status(200);
-                return "Text Sent";
+                if (whatsApp){
+                    SendWhatsApp.send(textMessage.getPhoneNumber(), TWILIO_SECTOR_MESSAGE_SID, textMessage.getMessage());
+                    res.status(200);
+                    return "WhatsApp Sent";
+                }
+               else {
+                    SendText.send(textMessage.getPhoneNumber(), textMessage.getMessage());
+                    res.status(200);
+                    return "Text Sent";
+                }
             } else{
                 res.status(400);
                 return "Recipient doesn't match user or user not found: Text not sent";
@@ -388,7 +398,7 @@ public class WebAppRunner {
                 OneTimePasswordService.saveOneTimePassword(oneTimePassword);
 
                 if(whatsApp && !user.getWhatsAppPhone().isEmpty()){
-                    SendWhatsApp.send(phoneNumber, CONTENT_SID, String.valueOf(randomNum));
+                    SendWhatsApp.send(phoneNumber, TWILIO_OTP_MESSAGE_SID, String.valueOf(randomNum));
                 }
                 else{
                     SendText.send(phoneNumber, "Your STEDI one-time password is : "+String.valueOf(randomNum));
