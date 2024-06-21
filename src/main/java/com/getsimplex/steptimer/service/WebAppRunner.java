@@ -169,7 +169,7 @@ public class WebAppRunner {
         });
         delete("/user/:username", (req,res)->{
            Optional<User> loggedInUser = userFilter(req,res);
-           if (loggedInUser.get().getPhone().equals("+1801-719-0908")) {//only allow admins to delete users
+           if (loggedInUser.get().getPhone().equals("scmurdock@gmail.com")) {//only allow admins to delete users
                CreateNewUser.deleteUser(req.params("username"));
                CustomerService.deleteCustomer(loggedInUser.get().getPhone());
            }
