@@ -170,8 +170,9 @@ public class WebAppRunner {
         delete("/user/:username", (req,res)->{
            Optional<User> loggedInUser = userFilter(req,res);
            if (loggedInUser.get().getPhone().equals("scmurdock@gmail.com")) {//only allow admins to delete users
-               CreateNewUser.deleteUser(req.params("username"));
-               CustomerService.deleteCustomer(loggedInUser.get().getPhone());
+               User userToDelete =  JedisData.getFromRedisMap(req.params("username"), User.class);
+               CreateNewUser.deleteUser(userToDelete.getUserName());
+               CustomerService.deleteCustomer(userToDelete.getPhone());
            }
            return "deleted user";
         });
