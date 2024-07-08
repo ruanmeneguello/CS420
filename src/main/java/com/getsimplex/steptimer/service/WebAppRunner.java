@@ -9,6 +9,7 @@ package com.getsimplex.steptimer.service;
 import com.getsimplex.steptimer.model.*;
 import com.getsimplex.steptimer.tcp.NettyServerBootstrap;
 import com.getsimplex.steptimer.utils.*;
+import com.google.common.util.concurrent.RateLimiter;
 import com.google.gson.Gson;
 import org.apache.commons.codec.digest.DigestUtils;
 import spark.Filter;
@@ -17,6 +18,7 @@ import spark.Response;
 import spark.Spark;
 
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,6 +33,7 @@ public class WebAppRunner {
 
     private static String TWILIO_OTP_MESSAGE_SID = "";
     private static String TWILIO_SECTOR_MESSAGE_SID;
+    private static ConcurrentHashMap<String,RateLimiter> rateLimiters = new ConcurrentHashMap<>();
 
     static{
         TWILIO_OTP_MESSAGE_SID = System.getenv("TWILIO_OTP_MESSAGE_SID");
@@ -130,6 +133,7 @@ public class WebAppRunner {
             return emailAddress;
         });
         post("/sendtext",(req,res)->{//this url is for the DevOps class at BYUI so they can deploy STEDI and not need Twilio Credentials
+            req.ip();
             Boolean whatsApp = Boolean.valueOf(req.queryParams("whatsApp"));
             res.type("application/json");
             //It only allows them to log in with their own user as long as it exits in the dev.stedi.me application
@@ -137,15 +141,27 @@ public class WebAppRunner {
             TextMessage textMessage = gson.fromJson(req.body(), TextMessage.class);//
             Optional<User> userOptional = userFilter(req,res);
             if (!userOptional.isEmpty() && userOptional.get().getPhone().equals(SendText.getFormattedPhone(textMessage.getPhoneNumber()))) {
+                String clientIp = req.ip();
+                // Get rate limiter for the current IP address
+                RateLimiter rateLimiter = rateLimiters.computeIfAbsent(clientIp, k -> RateLimiter.create(1)); // 1 requests per second per IP address
+                // If the rate limiter allows, proceed with the request
+                if (rateLimiter.tryAcquire()) {
                 if (whatsApp){
                     SendWhatsApp.send(textMessage.getPhoneNumber(), TWILIO_SECTOR_MESSAGE_SID, textMessage.getMessage());
                     res.status(200);
+                    System.out.println("WhatsApp message sent for source IP "+ clientIp);
                     return "WhatsApp Sent";
                 }
                else {
                     SendText.send(textMessage.getPhoneNumber(), textMessage.getMessage());
                     res.status(200);
+                    System.out.println("Text sent for source IP "+ clientIp);
                     return "Text Sent";
+                }
+                } else {
+                    res.status(429); // Too Many Requests
+                    System.out.println("Rate limit exceeded for source IP " + clientIp);
+                    return "Rate limit exceeded. Try again later.";
                 }
             } else{
                 res.status(400);

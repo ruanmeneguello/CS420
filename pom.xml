@@ -28,6 +28,7 @@
 <!--            <artifactId>commons-codec</artifactId>-->
 <!--            <version>20041127.091804</version>-->
 <!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
             <groupId>com.twilio.sdk</groupId>
             <artifactId>twilio</artifactId>
