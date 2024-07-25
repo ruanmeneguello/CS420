@@ -45,11 +45,9 @@ function setemail(){
 
 function setphone(){
     phone = $("#phone").val().replace(/\D+/g, "");
+    whatsAppPhone = phone;
 }
 
-function setwhatsappphone(){
-    whatsAppPhone = $("#whatsappphone").val().replace(/\D+/g, "");
-}
 
 function setbday(){
     bday = $("#bday").val();
