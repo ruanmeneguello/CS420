@@ -1,9 +1,10 @@
-# stedi
+# STEDI Web
 
 These commands assume that redis and kafka are running locally on ports 6379 and 9092 respectively.
+You will also need to install Maven before running the project.
 
 To start this project, run the following commands:
 
-`docker build . -t stedi`
+`mvn clean package --quiet`
 
-`docker run --env-file ./env.list stedi`
+`java -jar StepTimerWebsocket-1.0-SNAPSHOT.jar`
