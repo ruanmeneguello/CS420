@@ -30,9 +30,9 @@ public class CustomerService {
         return createOrUpdateCustomer(newCustomer, update);
 
     }
-    public static Customer getCustomerByPhone(String phoneNumber) throws Exception{
+    public static Customer getCustomerByPhone(String phoneNumber, String region) throws Exception{
 
-        String formattedPhoneNumber = SendText.getFormattedPhone(phoneNumber);//ex: 801-719-0908 becomes +18017190908
+        String formattedPhoneNumber = SendText.getFormattedPhone(phoneNumber, region);//ex: 801-719-0908 becomes +18017190908
         String formattedPhoneNumberDigitsOnly = formattedPhoneNumber.replaceAll("[^0-9]","");//ex: +18017190908 becomes 18017190908
         List<Customer> customers = JedisData.getEntitiesByScore(Customer.class, Long.valueOf(formattedPhoneNumberDigitsOnly), Long.valueOf(formattedPhoneNumberDigitsOnly));
         if (customers.isEmpty()){
@@ -53,9 +53,9 @@ public class CustomerService {
         if(newCustomer.getPhone().isEmpty() && !newCustomer.getWhatsAppPhone().isEmpty()){
             newCustomer.setPhone(newCustomer.getWhatsAppPhone());
         }
-        String phone = SendText.getFormattedPhone(newCustomer.getPhone());//ex: 801-719-0908 becomes: +18017190908
+        String phone = SendText.getFormattedPhone(newCustomer.getPhone(), newCustomer.getRegion());//ex: 801-719-0908 becomes: +18017190908
         newCustomer.setPhone(phone);
-        String whatsAppPhone = SendText.getFormattedPhone(newCustomer.getWhatsAppPhone());//ex: 801-719-0908 becomes: +18017190908
+        String whatsAppPhone = SendText.getFormattedPhone(newCustomer.getWhatsAppPhone(), newCustomer.getRegion());//ex: 801-719-0908 becomes: +18017190908
         newCustomer.setWhatsAppPhone(whatsAppPhone);
 
         String numericDigitsOnly = phone.replaceAll("[^0-9]","");

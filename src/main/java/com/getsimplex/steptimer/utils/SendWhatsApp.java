@@ -43,7 +43,7 @@ public class SendWhatsApp {
 
     public static String getFormattedPhone(String inputPhone) throws Exception{
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-        Phonenumber.PhoneNumber phoneNumber = phoneUtil.parse(inputPhone, "US");
+        Phonenumber.PhoneNumber phoneNumber = phoneUtil.parse(inputPhone, "CG");
         String formattedPhone = phoneUtil.format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
         formattedPhone = formattedPhone.replace(" ","");
         return formattedPhone;

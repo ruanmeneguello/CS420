@@ -14,6 +14,8 @@ public class Customer {
     private String phone;
     private String whatsAppPhone;
     private String birthDay;
+    private String region;
+
 
     private Date lastWalkerDate;
 
@@ -70,4 +72,13 @@ public class Customer {
     public void setLastWalkerDate(Date lastWalkerDate) {
         this.lastWalkerDate = lastWalkerDate;
     }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
 }

@@ -3,6 +3,7 @@ package com.getsimplex.steptimer.model;
 public class TextMessage {
     private String phoneNumber;
     private String message;
+    private String region;
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -18,5 +19,13 @@ public class TextMessage {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 }

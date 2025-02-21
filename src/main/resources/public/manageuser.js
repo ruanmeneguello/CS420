@@ -101,20 +101,21 @@ function changePassword(){
 
 }
 
-const requestreset = async ()=>{
+const requestreset = async () => {
     const cellNumber = document.getElementById("cellphone").value;
+    const countryCode = document.getElementById("countryCode").value;
     console.log(`Cell Number ${cellNumber}`);
 
     const options = {
-        method:'POST',
-        "content-type":"application/text"
+        method: 'POST',
+        "content-type": "application/text"
     }
 
-    await fetch("/twofactorlogin/"+cellNumber,options);
+    await fetch(`/twofactorlogin/${cellNumber}?region=${countryCode}${countryCode!=='US'?'&whatsApp=true':''}`, options);
 
-    sessionStorage.setItem("cellNumber",cellNumber);
+    sessionStorage.setItem("cellNumber", cellNumber);
 
-    document.location="/enterotp.html";
+    document.location = "/enterotp.html";
 }
 
 const enterotp = async ()=>{

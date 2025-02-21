@@ -18,6 +18,7 @@ import spark.Response;
 import spark.Spark;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import java.util.Optional;
@@ -140,7 +141,7 @@ public class WebAppRunner {
             Gson gson = new Gson();
             TextMessage textMessage = gson.fromJson(req.body(), TextMessage.class);//
             Optional<User> userOptional = userFilter(req,res);
-            if (!userOptional.isEmpty() && userOptional.get().getPhone().equals(SendText.getFormattedPhone(textMessage.getPhoneNumber()))) {
+            if (!userOptional.isEmpty() && userOptional.get().getPhone().equals(SendText.getFormattedPhone(textMessage.getPhoneNumber(), textMessage.getRegion()))) {
                 String clientIp = req.ip();
                 // Get rate limiter for the current IP address
                 RateLimiter rateLimiter = rateLimiters.computeIfAbsent(clientIp, k -> RateLimiter.create(1)); // 1 requests per second per IP address
@@ -153,7 +154,7 @@ public class WebAppRunner {
                     return "WhatsApp Sent";
                 }
                else {
-                    SendText.send(textMessage.getPhoneNumber(), textMessage.getMessage());
+                    SendText.send(textMessage.getPhoneNumber(), textMessage.getMessage(), textMessage.getRegion());
                     res.status(200);
                     System.out.println("Text sent for source IP "+ clientIp);
                     return "Text Sent";
@@ -185,7 +186,7 @@ public class WebAppRunner {
         });
         delete("/user/:username", (req,res)->{
            Optional<User> loggedInUser = userFilter(req,res);
-           if (loggedInUser.get().getPhone().equals("scmurdock@gmail.com")) {//only allow admins to delete users
+           if (loggedInUser.get().getEmail().equals("scmurdock@gmail.com")) {//only allow admins to delete users
                User userToDelete =  JedisData.getFromRedisMap(req.params("username"), User.class);
                CreateNewUser.deleteUser(userToDelete.getUserName());
                CustomerService.deleteCustomer(userToDelete.getPhone());
@@ -232,7 +233,8 @@ public class WebAppRunner {
 
         patch("/customer/lastwalkerdate/:customerPhone/:days", (req,res) ->{
             userFilter(req,res);//new users receive a login token before their customer profile is created, so we filter this request
-            Customer customer = CustomerService.getCustomerByPhone(req.params(":customerPhone"));//get existing customer from database
+            Customer customer = CustomerService.getCustomerByPhone(req.params(":customerPhone"), req.queryParams("region"));//get existing customer from database
+
             if (customer != null) {
                 int days = Integer.parseInt(req.params(":days"));
 
@@ -290,6 +292,7 @@ public class WebAppRunner {
             userFilter(req,res);//new users receive a login token before their customer profile is created, so we filter this request
             res.type("application/json");
             String phone =  req.params(":phone");
+            String region =  req.queryParams("region");
             Optional<User> optionalUser = Optional.empty();
             try {
               optionalUser = userFilter(req, res);
@@ -299,8 +302,8 @@ public class WebAppRunner {
                 System.out.println("*** Error Finding Customer: "+e.getMessage());
                 return null;
             }
-            if(optionalUser.isPresent() && optionalUser.get().getPhone().equals( SendText.getFormattedPhone(phone))){
-                String customerJson =gson.toJson(CustomerService.getCustomerByPhone(phone));
+            if(optionalUser.isPresent() && optionalUser.get().getPhone().equals( SendText.getFormattedPhone(phone,  optionalUser.get().getRegion()))){
+                String customerJson =gson.toJson(CustomerService.getCustomerByPhone(phone, region));
                 res.type("application/json");
                 res.body(customerJson);
                 return customerJson;
@@ -400,11 +403,12 @@ public class WebAppRunner {
     private static String twoFactorLogin(Request request, Response response){
         String phoneNumber =  request.params(":phoneNumber");
         Boolean whatsApp = Boolean.valueOf(request.queryParams("whatsApp"));
+        String region = request.queryParams("region");
         int randomNum = ThreadLocalRandom.current().nextInt(1111, 10000);
         User user=null;
         try {
-            phoneNumber = SendText.getFormattedPhone(phoneNumber);
-            user = FindUser.getUserByPhone(phoneNumber);
+            phoneNumber = SendText.getFormattedPhone(phoneNumber, region);
+            user = FindUser.getUserByPhone(phoneNumber, region);
             if (user!=null){
                 Long expiration = new Date().getTime()+100l * 365l * 24l *60l * 60l *1000l;//100 years
                 String loginToken=TokenService.createUserTokenSpecificTimeout(user.getUserName(), expiration);
@@ -419,7 +423,7 @@ public class WebAppRunner {
                     SendWhatsApp.send(phoneNumber, TWILIO_OTP_MESSAGE_SID, String.valueOf(randomNum));
                 }
                 else{
-                    SendText.send(phoneNumber, "Your STEDI one-time password is : "+String.valueOf(randomNum));
+                    SendText.send(phoneNumber, "Your STEDI one-time password is : "+String.valueOf(randomNum), region);
                 }
                 response.status(200);
 
@@ -444,7 +448,7 @@ public class WebAppRunner {
 
     private static Optional<User> userFilter(Request request, Response response) throws Exception{
             String tokenString = request.headers("suresteps.session.token");
-
+            Set<String> headers = request.headers();
             Optional<User> user = TokenService.getUserFromToken(tokenString);//
 
             Boolean tokenExpired = SessionValidator.validateToken(tokenString);

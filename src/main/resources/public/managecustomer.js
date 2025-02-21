@@ -53,6 +53,9 @@ function setbday(){
     bday = $("#bday").val();
 }
 
+function setregion() {
+    region = $("#countryCode").val();
+}
 
 function readonlyforms(formid){
     form = document.getElementById(formid);
@@ -95,8 +98,8 @@ function findcustomer(email){
     });
 }
 
-function createcustomer(){
-    //in case they hit the back/forward buttons and our in memory variables got reset
+function createcustomer() {
+    // In case they hit the back/forward buttons and our in-memory variables got reset
     setusername();
     setuserpassword();
     setverifypassword();
@@ -104,53 +107,50 @@ function createcustomer(){
     setemail();
     setphone();
     setbday();
+    setregion();
 
-//this is the more picky of the two operations, so let's try it first, and if it succeeds, create the customer, not vice
-// versa
-
+    // This is the more picky of the two operations, so let's try it first, and if it succeeds, create the customer, not vice versa
     $.ajax({
         type: 'POST',
         url: '/user',
         data: JSON.stringify({
-            'userName':email,
+            'userName': email,
             email,
             password,
             phone,
-            birthDate:bday,
+            birthDate: bday,
             verifyPassword,
             agreedToTermsOfUseDate: new Date().getTime(),
             agreedToCookiePolicyDate: new Date().getTime(),
             agreedToPrivacyPolicyDate: new Date().getTime(),
             agreedToTextMessageDate: new Date().getTime(),
-            whatsAppPhone
-
-        }),//we are using the email as the user name
-        success: function(loginToken) {
+            whatsAppPhone,
+            region
+        }), // We are using the email as the user name
+        success: function (loginToken) {
             createCustomer(loginToken);
         },
-        error: function(xhr){
+        error: function (xhr) {
             console.log(JSON.stringify(xhr))
-            if(xhr.status==409){
+            if (xhr.status == 409) {
                 alert("Email or cell # has already been previously registered");
-            } else{
+            } else {
                 alert("Error creating account. Please confirm password is at least 6 characters, has an upper case letter, a lower case letter, a number, and a symbol.")
             }
         },
         contentType: "application/text",
         dataType: 'text'
     });
-
-
 }
 
-const createCustomer = (loginToken)=>{
-
+const createCustomer = (loginToken) => {
     const customer = {
-        customerName : customerName,
-        email : email,
-        phone : phone,
+        customerName: customerName,
+        email: email,
+        phone: phone,
         birthDay: bday,
-        whatsAppPhone
+        whatsAppPhone,
+        region
     }
 
     $.ajax({
@@ -159,8 +159,8 @@ const createCustomer = (loginToken)=>{
         data: JSON.stringify(customer),
         contentType: 'application/text',
         dataType: 'text',
-        headers:{
-            "suresteps.session.token":loginToken
+        headers: {
+            "suresteps.session.token": loginToken
         },
         success: function (data) {
             localStorage.setItem("customer", JSON.stringify(customer));
@@ -174,7 +174,6 @@ const createCustomer = (loginToken)=>{
             } else {
                 alert("Error creating account. Please confirm information is correct.")
             }
-        },
+        }
     });
 }
-

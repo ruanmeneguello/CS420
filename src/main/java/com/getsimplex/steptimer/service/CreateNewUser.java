@@ -47,7 +47,7 @@ public class CreateNewUser {
         String password = createUser.getPassword();
         String verifyPassword = createUser.getVerifyPassword();
         String email = createUser.getEmail();
-        String phone = !createUser.getPhone().isEmpty() ?SendText.getFormattedPhone(createUser.getPhone()):null;
+        String phone = !createUser.getPhone().isEmpty() ?SendText.getFormattedPhone(createUser.getPhone(), createUser.getRegion()):null;
         String standardizedPhoneDigitsOnly= phone.replaceAll("[^0-9]","");
         String bday = createUser.getBirthDate();
         String deviceId = createUser.getDeviceNickName();
@@ -87,7 +87,7 @@ public class CreateNewUser {
         }
 
         if(createUser.getWhatsAppPhone() != null && !createUser.getWhatsAppPhone().isEmpty()){
-            String whatsAppPhone = SendText.getFormattedPhone(createUser.getWhatsAppPhone());
+            String whatsAppPhone = SendText.getFormattedPhone(createUser.getWhatsAppPhone(), createUser.getRegion());
             addUser.setWhatsAppPhone(whatsAppPhone);
         }
 

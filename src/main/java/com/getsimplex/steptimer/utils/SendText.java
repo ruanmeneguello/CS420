@@ -23,9 +23,9 @@ public class SendText {
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
     }
 
-    public static void send(String destinationPhone, String text) throws Exception{
+    public static void send(String destinationPhone, String text, String region) throws Exception{
 
-        String formattedPhone = getFormattedPhone(destinationPhone);
+        String formattedPhone = getFormattedPhone(destinationPhone, region);
         PhoneNumber destination = new PhoneNumber(formattedPhone);
         PhoneNumber origin = new PhoneNumber(TWILIO_PHONE);
 
@@ -35,9 +35,9 @@ public class SendText {
 
     }
 
-    public static String getFormattedPhone(String inputPhone) throws Exception{
+    public static String getFormattedPhone(String inputPhone, String region) throws Exception{
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-        Phonenumber.PhoneNumber phoneNumber = phoneUtil.parse(inputPhone, "US");
+        Phonenumber.PhoneNumber phoneNumber = phoneUtil.parse(inputPhone, region);
         String formattedPhone = phoneUtil.format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
         formattedPhone = formattedPhone.replace(" ","");
         return formattedPhone;

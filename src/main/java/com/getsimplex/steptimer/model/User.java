@@ -19,6 +19,8 @@ public class User {
     private String whatsAppPhone;
     private String  birthDate;
     private String deviceNickName;
+    private String region;
+
     private boolean locked;
 
     private long agreedToTextMessageDate;
@@ -131,5 +133,13 @@ public class User {
 
     public void setAgreedToTextMessageDate(long agreedToTextMessageDate) {
         this.agreedToTextMessageDate = agreedToTextMessageDate;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 }

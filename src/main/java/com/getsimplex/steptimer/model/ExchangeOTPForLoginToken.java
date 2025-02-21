@@ -6,6 +6,7 @@ public class ExchangeOTPForLoginToken {
 
     private String phoneNumber;
     private Integer oneTimePassword;
+    private String region;
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -21,5 +22,13 @@ public class ExchangeOTPForLoginToken {
 
     public void setOneTimePassword(Integer oneTimePassword) {
         this.oneTimePassword = oneTimePassword;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+    public void setRegion(String region) {
+        this.region = region;
+
     }
 }
