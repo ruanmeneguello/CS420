@@ -9,6 +9,7 @@ import com.getsimplex.steptimer.utils.JedisData;
 import com.getsimplex.steptimer.utils.NotFoundException;
 import com.getsimplex.steptimer.utils.SendText;
 import com.google.gson.Gson;
+import scala.concurrent.java8.FuturesConvertersImpl;
 import spark.Request;
 
 import java.util.Date;
@@ -20,6 +21,9 @@ public class OneTimePasswordService {
     public static String handleRequest(Request request) throws Exception{
         String requestBody = request.body();
         ExchangeOTPForLoginToken exchangeOTPForLoginToken = gson.fromJson(requestBody, ExchangeOTPForLoginToken.class);
+        if(exchangeOTPForLoginToken.getRegion()==null) {
+            exchangeOTPForLoginToken.setRegion("US");
+        }
         return exchangeOneTimePasswordForToken(exchangeOTPForLoginToken);
     }
 
