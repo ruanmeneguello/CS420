@@ -21,7 +21,7 @@ public class OneTimePasswordService {
     public static String handleRequest(Request request) throws Exception{
         String requestBody = request.body();
         ExchangeOTPForLoginToken exchangeOTPForLoginToken = gson.fromJson(requestBody, ExchangeOTPForLoginToken.class);
-        if(exchangeOTPForLoginToken.getRegion()==null) {
+        if(exchangeOTPForLoginToken.getRegion()==null || exchangeOTPForLoginToken.getRegion().isEmpty()){
             exchangeOTPForLoginToken.setRegion("US");
         }
         return exchangeOneTimePasswordForToken(exchangeOTPForLoginToken);

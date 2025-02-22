@@ -5,7 +5,7 @@ let password = "";
 let usertoken="";
 let verifyPassword = "";
 //let passwordRegEx=/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–[{}]:;',?/*~$^+=<>]).{6,100})/;
-
+let countryCode="";
 
 
     $(document).ready(function(){
@@ -103,7 +103,10 @@ function changePassword(){
 
 const requestreset = async () => {
     const cellNumber = document.getElementById("cellphone").value;
-    const countryCode = document.getElementById("countryCode").value;
+    countryCode = document.getElementById("countryCode").value;
+  // Store countryCode as a cookie
+     document.cookie = `countryCode=${countryCode}; path=/`;
+
     console.log(`Cell Number ${cellNumber}`);
 
     const options = {
@@ -112,7 +115,6 @@ const requestreset = async () => {
     }
 
     await fetch(`/twofactorlogin/${cellNumber}?region=${countryCode}${countryCode!=='US'?'&whatsApp=true':''}`, options);
-
     sessionStorage.setItem("cellNumber", cellNumber);
 
     document.location = "/enterotp.html";
@@ -121,6 +123,10 @@ const requestreset = async () => {
 const enterotp = async ()=>{
     const otp = document.getElementById("otp").value;
     const cellNumber = sessionStorage.getItem("cellNumber");
+
+
+        countryCode = getCookie('countryCode');
+
     const options = {
         method:'POST',
         headers:{
@@ -128,7 +134,8 @@ const enterotp = async ()=>{
         },
         body:JSON.stringify({
             phoneNumber:cellNumber,
-            oneTimePassword:otp
+            oneTimePassword:otp,
+            region:countryCode
         })
     }
 
@@ -150,6 +157,13 @@ const enterFunction = (event) =>{
         event.preventDefault();
         $("#loginbtn").click();
     }
+}
+
+// Retrieve countryCode from cookie
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
 var passwordField = document.getElementById("password");
