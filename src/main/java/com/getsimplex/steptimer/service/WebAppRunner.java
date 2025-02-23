@@ -149,7 +149,7 @@ public class WebAppRunner {
                 // If the rate limiter allows, proceed with the request
                 if (rateLimiter.tryAcquire()) {
                 if (whatsApp){
-                    SendWhatsApp.send(textMessage.getPhoneNumber(), TWILIO_SECTOR_MESSAGE_SID, textMessage.getMessage());
+                    SendWhatsApp.send(textMessage.getPhoneNumber(), TWILIO_SECTOR_MESSAGE_SID, textMessage.getMessage(), region);
                     res.status(200);
                     System.out.println("WhatsApp message sent for source IP "+ clientIp);
                     return "WhatsApp Sent";
@@ -421,7 +421,7 @@ public class WebAppRunner {
                 OneTimePasswordService.saveOneTimePassword(oneTimePassword);
 
                 if(whatsApp && !user.getWhatsAppPhone().isEmpty()){
-                    SendWhatsApp.send(phoneNumber, TWILIO_OTP_MESSAGE_SID, String.valueOf(randomNum));
+                    SendWhatsApp.send(phoneNumber, TWILIO_OTP_MESSAGE_SID, String.valueOf(randomNum), region);
                 }
                 else{
                     SendText.send(phoneNumber, "Your STEDI one-time password is : "+String.valueOf(randomNum), region);

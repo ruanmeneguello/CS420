@@ -22,9 +22,9 @@ public class SendWhatsApp {
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
     }
 
-    public static void send(String destinationPhone, String contentSid, String templateVariable) throws Exception{
+    public static void send(String destinationPhone, String contentSid, String templateVariable, String region) throws Exception{
 
-        String formattedPhone = getFormattedPhone(destinationPhone);
+        String formattedPhone = getFormattedPhone(destinationPhone, region);
         formattedPhone = formattedPhone.replaceAll("-","");
 
       //  Message message =Message.creator(destination, origin, text).create();
@@ -41,9 +41,9 @@ public class SendWhatsApp {
 
     }
 
-    public static String getFormattedPhone(String inputPhone) throws Exception{
+    public static String getFormattedPhone(String inputPhone, String region) throws Exception{
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-        Phonenumber.PhoneNumber phoneNumber = phoneUtil.parse(inputPhone, "CG");
+        Phonenumber.PhoneNumber phoneNumber = phoneUtil.parse(inputPhone, region);
         String formattedPhone = phoneUtil.format(phoneNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL);
         formattedPhone = formattedPhone.replace(" ","");
         return formattedPhone;
