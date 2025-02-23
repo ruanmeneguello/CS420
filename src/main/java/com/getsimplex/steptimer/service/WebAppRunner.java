@@ -136,12 +136,13 @@ public class WebAppRunner {
         post("/sendtext",(req,res)->{//this url is for the DevOps class at BYUI so they can deploy STEDI and not need Twilio Credentials
             req.ip();
             Boolean whatsApp = Boolean.valueOf(req.queryParams("whatsApp"));
+            String region = req.queryParams("region");
             res.type("application/json");
             //It only allows them to log in with their own user as long as it exits in the dev.stedi.me application
             Gson gson = new Gson();
             TextMessage textMessage = gson.fromJson(req.body(), TextMessage.class);//
             Optional<User> userOptional = userFilter(req,res);
-            if (!userOptional.isEmpty() && userOptional.get().getPhone().equals(SendText.getFormattedPhone(textMessage.getPhoneNumber(), textMessage.getRegion()))) {
+            if (!userOptional.isEmpty() && userOptional.get().getPhone().equals(SendText.getFormattedPhone(textMessage.getPhoneNumber(), region))) {
                 String clientIp = req.ip();
                 // Get rate limiter for the current IP address
                 RateLimiter rateLimiter = rateLimiters.computeIfAbsent(clientIp, k -> RateLimiter.create(1)); // 1 requests per second per IP address
@@ -154,7 +155,7 @@ public class WebAppRunner {
                     return "WhatsApp Sent";
                 }
                else {
-                    SendText.send(textMessage.getPhoneNumber(), textMessage.getMessage(), textMessage.getRegion());
+                    SendText.send(textMessage.getPhoneNumber(), textMessage.getMessage(),region);
                     res.status(200);
                     System.out.println("Text sent for source IP "+ clientIp);
                     return "Text Sent";
