@@ -56,7 +56,7 @@ steps:
       - run
       - --filename=app.yaml
       - --image=gcr.io/$PROJECT_ID/stedi:$SHORT_SHA
-      - --location=us-east1
+      - --location=us-central1
       - --cluster=autopilot-cluster-1
 
   # This step scales up the stedi pod
@@ -68,7 +68,7 @@ steps:
       - 'stedi'
       - '--replicas=1'
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=us-east1'
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1'
       - 'CLOUDSDK_CONTAINER_CLUSTER=autopilot-cluster-1'
 
 
