@@ -74,4 +74,4 @@ steps:
 options:
   logging: CLOUD_LOGGING_ONLY
   logBucket: gs://helpful-ally-451215-a3-cloudbuild-logs
-  serviceAccount: 178150524411-compute@developer.gserviceaccount.com
+  service_account: 178150524411-compute@developer.gserviceaccount.com
