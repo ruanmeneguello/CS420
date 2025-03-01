@@ -47,7 +47,7 @@ steps:
       - 'stedi'
       - '--replicas=0'
     env:
-      - 'CLOUDSDK_COMPUTE_ZONE=us-east1'
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1'
       - 'CLOUDSDK_CONTAINER_CLUSTER=autopilot-cluster-1'
 
       # This step deploys the application in Kubernetes
