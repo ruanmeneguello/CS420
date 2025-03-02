@@ -33,7 +33,7 @@ spec:
 # The name of the container is specified below      
         - name: stedi
 # The image is a prebuilt file containing the operating system        
-          image: gcr.io/cubs-consulting/stedi:latest
+          image: gcr.io/helpful-ally-451215-a3/stedi:latest
           env:
             - name: REDIS_PASSWORD
               valueFrom:

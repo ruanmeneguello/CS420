@@ -18,7 +18,7 @@ spec:
         cloud.google.com/gke-spot: "true"    
       containers:
         - name: stedi-prod
-          image: gcr.io/cubs-consulting/stedi
+          image: gcr.io/helpful-ally-451215-a3/stedi:latest
           env:
             - name: REDIS_PASSWORD
               valueFrom:
