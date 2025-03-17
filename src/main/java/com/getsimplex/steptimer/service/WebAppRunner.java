@@ -187,8 +187,10 @@ public class WebAppRunner {
         });
         delete("/user/:username", (req,res)->{
            Optional<User> loggedInUser = userFilter(req,res);
-           if (loggedInUser.get().getEmail().equals("scmurdock@gmail.com")) {//only allow admins to delete users
-               User userToDelete =  JedisData.getFromRedisMap(req.params("username"), User.class);
+           User userToDelete =  JedisData.getFromRedisMap(req.params("username"), User.class);
+           Boolean isAdmin = loggedInUser.get().getEmail().equals("scmurdock@gmail.com"); //check if user is admin
+           Boolean isTheSameUser = loggedInUser.get().getEmail().equals(userToDelete.getEmail()); //check if the requesting user and the user to be deleted are the same
+           if (isAdmin || isTheSameUser) { //allow admins to delete any user, and users to delete themselves
                CreateNewUser.deleteUser(userToDelete.getUserName());
                CustomerService.deleteCustomer(userToDelete.getPhone());
            }
@@ -509,7 +511,7 @@ public class WebAppRunner {
         SaveRapidStepTest.save(request.body());
     }
 
-	
+
     private static int getHerokuAssignedPort() {
         ProcessBuilder processBuilder = new ProcessBuilder();
         if (processBuilder.environment().get("PORT") != null) {
