@@ -186,13 +186,23 @@ public class WebAppRunner {
             return validPassword;
         });
         delete("/user/:username", (req,res)->{
-           Optional<User> loggedInUser = userFilter(req,res);
-           if (loggedInUser.get().getEmail().equals("scmurdock@gmail.com")) {//only allow admins to delete users
-               User userToDelete =  JedisData.getFromRedisMap(req.params("username"), User.class);
-               CreateNewUser.deleteUser(userToDelete.getUserName());
-               CustomerService.deleteCustomer(userToDelete.getPhone());
-           }
-           return "deleted user";
+            try {
+                Optional<User> loggedInUser = userFilter(req,res);
+                User userToDelete =  JedisData.getFromRedisMap(req.params("username"), User.class);
+                Boolean isAdmin = loggedInUser.get().getEmail().equals("scmurdock@gmail.com"); //check if user is admin
+                Boolean isTheSameUser = loggedInUser.get().getEmail().equals(userToDelete.getEmail()); //check if the requesting user and the user to be deleted are the same
+                if (isAdmin || isTheSameUser) { //allow admins to delete any user, and users to delete themselves
+                    CreateNewUser.deleteUser(userToDelete.getUserName());
+                    CustomerService.deleteCustomer(userToDelete.getPhone());
+                    return "Deleted user " + userToDelete.getUserName();
+                } else { // if the user is not an admin nor the same user, return unauthorized
+                    res.status(401);
+                    return "Unauthorized";
+                }
+            } catch (Exception e) { // if an error occurs, return a 500 error
+                res.status(500);
+                return "Error deleting user: " + e.getMessage();
+            }
         });
         get ("/stephistory/:customer", (req, res)-> {
             res.type("application/json");
@@ -509,7 +519,7 @@ public class WebAppRunner {
         SaveRapidStepTest.save(request.body());
     }
 
-	
+
     private static int getHerokuAssignedPort() {
         ProcessBuilder processBuilder = new ProcessBuilder();
         if (processBuilder.environment().get("PORT") != null) {
