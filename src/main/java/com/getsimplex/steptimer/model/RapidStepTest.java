@@ -20,6 +20,7 @@ public class RapidStepTest implements Comparable<RapidStepTest>{
     private Integer totalSteps;
     private Integer feelingScore;
     private String customer;
+    private String deviceId;
 
     @Override
     public int compareTo(RapidStepTest rapidStepTest){
@@ -113,5 +114,13 @@ public class RapidStepTest implements Comparable<RapidStepTest>{
 
     public void setCustomer(String customer) {
         this.customer = customer;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 }

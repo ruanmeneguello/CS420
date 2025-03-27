@@ -29,13 +29,49 @@ public class DeviceWebSocketHandler {
     private static Logger logger = Logger.getLogger(DeviceWebSocketHandler.class.getName());
 
     @OnWebSocketConnect
-    public void onConnect(Session session) throws Exception{
-        DeviceInterest deviceInterest = new DeviceInterest();
-        deviceInterest.setDeviceId("1234");//this is just a default device id used for testing
-        deviceInterest.setInterestedSession(session);
-        deviceInterest.setInterestedUser("clinicmanager");
-        MessageIntake.route(deviceInterest);//this should make it so new messages from Kafka for device 1234 go to this user's websocket
+    public void onConnect(Session session) throws Exception {
+        // Extract the deviceId from the query parameters
+        String query = session.getUpgradeRequest().getQueryString();
+        String deviceId = "defaultDeviceId"; // Default deviceId if none is provided
 
+        if (query != null && query.contains("deviceId=")) {
+            deviceId = query.split("deviceId=")[1].split("&")[0]; // Extract deviceId from query string
+        }
+
+        Map headers = session.getUpgradeRequest().getHeaders();
+        // Retrieve the suresteps.session.token header
+        String token = session.getUpgradeRequest().getHeader("suresteps.session.token");
+
+        if (token == null || token.isEmpty()) {
+            logger.log(Level.WARNING, "Missing suresteps.session.token header. Closing session.");
+            session.close();
+            return;
+        }
+
+        // Validate the token and retrieve the authenticated user
+
+        if (SessionValidator.tokenIsExpired(token)) {
+            logger.log(Level.WARNING, "Invalid or expired token. Closing session.");
+            session.close();
+            return;
+        }
+
+        String authenticatedUser = SessionValidator.emailFromToken(token);
+        if(authenticatedUser!=null & !authenticatedUser.isEmpty()) {
+            // Set up the DeviceInterest object
+            DeviceInterest deviceInterest = new DeviceInterest();
+            deviceInterest.setDeviceId(deviceId); // Use the extracted deviceId
+            deviceInterest.setInterestedSession(session);
+            deviceInterest.setInterestedUser(authenticatedUser); // Set the interested user based on the authenticated user
+
+            // Route messages for the specified deviceId to this user's WebSocket
+            MessageIntake.route(deviceInterest);
+
+            logger.log(Level.INFO, "WebSocket connection established for user: " + authenticatedUser + " and deviceId: " + deviceId);
+        } else {
+            logger.log(Level.WARNING, "Unable to retrieve authenticated user. Closing session.");
+            session.close();
+        }
     }
 
     @OnWebSocketClose

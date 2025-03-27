@@ -49,38 +49,40 @@ public class StepHistory {
         }
 
         List<RapidStepTest> rapidStepTestsSortedByDate = rapidStepTestRepository.getArrayAtKey(user.getPhone());
+        //Filter here to make sure we have a complete test
         rapidStepTestsSortedByDate = rapidStepTestsSortedByDate.stream().filter(rapidStepTest -> rapidStepTest.getStopTime()!=null && rapidStepTest.getStepPoints().size()==30 && rapidStepTest.getTestTime()!=null).collect(Collectors.toList());
         //List<RapidStepTest> rapidStepTestsSortedByDate = JedisData.getEntitiesByIndex(RapidStepTest.class,"CustomerId", email);
         Collections.sort(rapidStepTestsSortedByDate);
-        if (rapidStepTestsSortedByDate.size()<4){
-            throw new NotFoundException("Customer "+email+" has: "+rapidStepTestsSortedByDate.size()+" rapid step tests on file which is less than the required number(4) to calculate fall risk.");
+        if (rapidStepTestsSortedByDate.size()>4) {
+
+            RapidStepTest mostRecentTest = rapidStepTestsSortedByDate.get(rapidStepTestsSortedByDate.size() - 1);
+            RapidStepTest secondMostRecentTest = rapidStepTestsSortedByDate.get(rapidStepTestsSortedByDate.size() - 2);
+
+            BigDecimal currentTestAverageScore = BigDecimal.valueOf((mostRecentTest.getStopTime() - mostRecentTest.getStartTime()) + (secondMostRecentTest.getStopTime() - secondMostRecentTest.getStartTime())).divide(BigDecimal.valueOf(2l));
+
+            RapidStepTest thirdMostRecentTest = rapidStepTestsSortedByDate.get(rapidStepTestsSortedByDate.size() - 3);
+            RapidStepTest fourthMostRecentTest = rapidStepTestsSortedByDate.get(rapidStepTestsSortedByDate.size() - 4);
+
+            BigDecimal previousTestAverageScore = BigDecimal.valueOf((thirdMostRecentTest.getStopTime() - thirdMostRecentTest.getStartTime()) + (fourthMostRecentTest.getStopTime() - fourthMostRecentTest.getStartTime())).divide(BigDecimal.valueOf(2l));
+
+            BigDecimal riskScore = (previousTestAverageScore.subtract(currentTestAverageScore)).divide(new BigDecimal(1000l));
+            //positive means they have improved
+            //negative means they have declined
+
+            Integer birthYear = Integer.valueOf(customer.get().getBirthDay().split("-")[0]);
+
+            CustomerRisk customerRisk = new CustomerRisk();
+            customerRisk.setScore(riskScore.setScale(2, RoundingMode.HALF_UP).toBigInteger().floatValue());
+            customerRisk.setCustomer(email);
+            customerRisk.setRiskDate(new Date(mostRecentTest.getStopTime()));
+            customerRisk.setBirthYear(birthYear);
+
+            JedisData.loadToJedisWithIndex(customerRisk, email, customerRisk.getRiskDate().getTime(), "BirthYear", String.valueOf(birthYear));
+            return gson.toJson(customerRisk);
+        } else {
+            return null;//we're just saving data for single steps
         }
 
-        RapidStepTest mostRecentTest = rapidStepTestsSortedByDate.get(rapidStepTestsSortedByDate.size()-1);
-        RapidStepTest secondMostRecentTest = rapidStepTestsSortedByDate.get(rapidStepTestsSortedByDate.size()-2);
-
-        BigDecimal currentTestAverageScore = BigDecimal.valueOf((mostRecentTest.getStopTime()-mostRecentTest.getStartTime())+ (secondMostRecentTest.getStopTime()-secondMostRecentTest.getStartTime())).divide(BigDecimal.valueOf(2l));
-
-        RapidStepTest thirdMostRecentTest = rapidStepTestsSortedByDate.get(rapidStepTestsSortedByDate.size()-3);
-        RapidStepTest fourthMostRecentTest = rapidStepTestsSortedByDate.get(rapidStepTestsSortedByDate.size()-4);
-
-        BigDecimal previousTestAverageScore = BigDecimal.valueOf((thirdMostRecentTest.getStopTime()-thirdMostRecentTest.getStartTime())+ (fourthMostRecentTest.getStopTime()-fourthMostRecentTest.getStartTime())).divide(BigDecimal.valueOf(2l));
-
-        BigDecimal riskScore = (previousTestAverageScore.subtract(currentTestAverageScore)).divide(new BigDecimal(1000l));
-        //positive means they have improved
-        //negative means they have declined
-
-        Integer birthYear = Integer.valueOf(customer.get().getBirthDay().split("-")[0]);
-
-        CustomerRisk customerRisk = new CustomerRisk();
-        customerRisk.setScore(riskScore.setScale(2, RoundingMode.HALF_UP).toBigInteger().floatValue());
-        customerRisk.setCustomer(email);
-        customerRisk.setRiskDate(new Date(mostRecentTest.getStopTime()));
-        customerRisk.setBirthYear(birthYear);
-
-        JedisData.loadToJedisWithIndex(customerRisk, email, customerRisk.getRiskDate().getTime(), "BirthYear", String.valueOf(birthYear));
-
-        return gson.toJson(customerRisk);
     }
 
 

@@ -47,6 +47,11 @@ public class DeviceRouter extends UntypedActor {
             }
 
         } else if (object instanceof DeviceInterest){
+
+            //TO-DO: if a user tries to start a session with a device that is already in use, we need to prevent that from happening
+            // so we need to block their request and give some kind of message that the device is already in use, unless it is the same user
+            // or if the session has been cancelled or has completed
+
             DeviceInterest deviceInterest = (DeviceInterest) object;
             if(!deviceRegistry.containsKey(deviceInterest.getDeviceId())){
                 deviceRegistry.put(deviceInterest.getDeviceId(),deviceInterest);

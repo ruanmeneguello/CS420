@@ -462,7 +462,7 @@ public class WebAppRunner {
             Set<String> headers = request.headers();
             Optional<User> user = TokenService.getUserFromToken(tokenString);//
 
-            Boolean tokenExpired = SessionValidator.validateToken(tokenString);
+            Boolean tokenExpired = SessionValidator.tokenIsExpired(tokenString);
 
             if (user.isPresent() && tokenExpired && !user.get().isLocked()){//if a user is locked, we won't renew tokens until they are unlocked
                 TokenService.renewToken(tokenString);
