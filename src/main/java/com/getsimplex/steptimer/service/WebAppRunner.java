@@ -17,11 +17,9 @@ import spark.Request;
 import spark.Response;
 import spark.Spark;
 
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static spark.Spark.*;
@@ -98,32 +96,61 @@ public class WebAppRunner {
             res.body(response);
             return response;
         }
-            );
-        patch("/user/:username",(req,res)->{//update password
-            userFilter(req,res);
-            User existingUser = (User) JedisData.getFromRedisMap(req.params("username"), User.class);
-            String response = "";
-            if (existingUser!=null){
-                User userUpdate = gson.fromJson(req.body(),User.class);
-                if (CreateNewUser.validatePassword(userUpdate.getPassword())){
-                    existingUser.setPassword(DigestUtils.sha256Hex(userUpdate.getPassword()));
-                    JedisData.updateRedisMap(existingUser,existingUser.getUserName());
-                    res.status(200);
-                    response = "Updated password";
-                    res.body(response);
-                } else{
-                    res.status(400);
-                    response="Password doesn't meet requirements";
-                    res.body(response);
-                }
-            } else{
-                res.status(404);//user not found
-                response = "User "+req.params("username")+" not found.";
-                res.body(response);
+        );
+
+        patch("/user/:username", (req, res) -> {
+            Optional<User> loggedInUserOptional = userFilter(req, res);
+            String existingUserName = req.params("username");
+            if(loggedInUserOptional.isEmpty() || !existingUserName.equals(loggedInUserOptional.get().getUserName())){//users can only update their own information
+                res.status(403); // Forbidden
+                res.body("You are not authorized to update this user.");
+                return "You are not authorized to update this user.";
             }
 
+            User existingUser = (User) JedisData.getFromRedisMap(existingUserName, User.class);
+            String response = "";
+
+            if (existingUser != null) {
+                User userUpdate = gson.fromJson(req.body(), User.class);
+
+                boolean updated = false;
+
+                // Update password if provided
+                if (userUpdate.getPassword() != null) {
+                    if (CreateNewUser.validatePassword(userUpdate.getPassword())) {
+                        existingUser.setPassword(DigestUtils.sha256Hex(userUpdate.getPassword()));
+                        updated = true;
+                    } else {
+                        res.status(400);
+                        response = "Password doesn't meet requirements";
+                        res.body(response);
+                        return response;
+                    }
+                }
+
+                // Update expoPushToken if provided
+                if (userUpdate.getExpoPushToken() != null) {
+                    existingUser.setExpoPushToken(userUpdate.getExpoPushToken());
+                    updated = true;
+                }
+
+                if (updated) {
+                    JedisData.updateRedisMap(existingUser, existingUser.getUserName());
+                    res.status(200);
+                    response = "User updated successfully";
+                } else {
+                    res.status(400);
+                    response = "No valid fields to update";
+                }
+            } else {
+                res.status(404); // User not found
+                response = "User " + req.params("username") + " not found.";
+            }
+
+            res.body(response);
             return response;
         });
+
         get("/validate/:token", (req,res)->{
             String emailAddress = SessionValidator.emailFromToken(req.params(":token"));
             if(emailAddress.isEmpty() || emailAddress==null){
@@ -318,6 +345,35 @@ public class WebAppRunner {
             return  null;
         });
 
+        get("/pushtokentesting/:userName", (req, res) -> {
+            String requestedUserName = req.params(":userName");
+            List<String> authorizedSenders = new ArrayList<>();
+            Optional<User> loggedInUserOptional = userFilter(req, res);
+
+            if (loggedInUserOptional.isPresent()) {
+                authorizedSenders.add("scmurdock@gmail.com");
+                authorizedSenders.add("physician@stedi.com");
+                authorizedSenders.add(loggedInUserOptional.get().getUserName());
+            }
+
+            if (authorizedSenders.contains(requestedUserName)) {
+                User requestedUser = FindUser.getUserByUserName(requestedUserName);
+
+                if (requestedUser != null) {
+                    // Remove sensitive information
+                    requestedUser.setPassword(null);
+                    res.type("application/json");
+                    return gson.toJson(requestedUser.getExpoPushToken());
+                } else {
+                    res.status(404);
+                    return "User not found.";
+                }
+            } else {
+                res.status(403);
+                return "Unauthorized access.";
+            }
+        });
+
         post("/login", (req, res)->loginUser(req, res));
         post("/twofactorlogin/:phoneNumber",(req, res) -> twoFactorLogin(req, res));
 
@@ -357,6 +413,24 @@ public class WebAppRunner {
             }
             return returnBody;
         });
+
+
+
+        //TO-DO: the secure implementation
+        post("/notify/:recipient",((req,res)->{
+            Optional<User> user = userFilter(req, res);//this is the user sending the notification
+            String recipientEmail = req.params(":recipient");//this should be the email address of the recipient  of the message
+            //TO-DO: look up if the recipient gave their consent to share their balance record with the user sending the notification
+            boolean userSharedWithRequestor = true;
+            if(userSharedWithRequestor){
+                User recipient = FindUser.getUserByUserName(recipientEmail);
+                /// String expoPushNotificationToken = recipient.getExpoPushNotificationToken();
+
+                //TO-DO: call the EAS endpoint and send them the message
+            }
+            res.status(200);
+            return null;
+        }));
         get("/riskscore/:customer",((req,res) -> {
             String customer = req.params(":customer");
             String returnBody = "";
