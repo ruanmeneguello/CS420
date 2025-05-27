@@ -345,7 +345,7 @@ public class WebAppRunner {
             return  null;
         });
 
-        get("/pushtokentesting/:userName", (req, res) -> {
+        get("/pushtokentestonly/:userName", (req, res) -> {
             String requestedUserName = req.params(":userName");
             List<String> authorizedSenders = new ArrayList<>();
             Optional<User> loggedInUserOptional = userFilter(req, res);
