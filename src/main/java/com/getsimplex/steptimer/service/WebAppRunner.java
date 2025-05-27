@@ -354,9 +354,14 @@ public class WebAppRunner {
                 authorizedSenders.add("scmurdock@gmail.com");
                 authorizedSenders.add("physician@stedi.com");
                 authorizedSenders.add(loggedInUserOptional.get().getUserName());
+            } else{
+                res.status(401);
+                return "Unauthorized access.";
             }
 
-            if (authorizedSenders.contains(requestedUserName)) {
+            //physicans or admins can contact anyone
+            //anyone can contact the physican
+            if (authorizedSenders.contains(loggedInUserOptional.get().getUserName()) || requestedUserName.equals("phyisican@stedi.com")) {
                 User requestedUser = FindUser.getUserByUserName(requestedUserName);
 
                 if (requestedUser != null) {
