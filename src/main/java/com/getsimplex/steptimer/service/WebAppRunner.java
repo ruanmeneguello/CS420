@@ -361,7 +361,7 @@ public class WebAppRunner {
 
             //physicans or admins can contact anyone
             //anyone can contact the physican
-            if (authorizedSenders.contains(loggedInUserOptional.get().getUserName()) || requestedUserName.equals("phyisican@stedi.com")) {
+            if (authorizedSenders.contains(loggedInUserOptional.get().getUserName()) || requestedUserName.equals("physician@stedi.com")) {
                 User requestedUser = FindUser.getUserByUserName(requestedUserName);
 
                 if (requestedUser != null) {
