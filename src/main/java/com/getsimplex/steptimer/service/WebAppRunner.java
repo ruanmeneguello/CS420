@@ -379,6 +379,72 @@ public class WebAppRunner {
             }
         });
 
+        post("/simulatePushNotificationToPhysician", (req, res) -> {
+            try {
+                // Parse incoming JSON safely
+                String body = req.body();
+                java.lang.reflect.Type mapType = new com.google.gson.reflect.TypeToken<Map<String, Object>>(){}.getType();
+                Map<String, Object> requestBody = gson.fromJson(body, mapType);
+                // Check for 'data' field and ensure it's a Map
+                Object dataObj = requestBody.get("data");
+                if (!(dataObj instanceof Map)) {
+                    res.status(400);
+                    return "Missing or invalid 'data' field.";
+                }
+                Map<?,?> data = (Map<?,?>) dataObj;
+                // Check for 'username' field in data
+                Object usernameObj = data.get("username");
+                String username = usernameObj != null ? usernameObj.toString() : null;
+                if (username == null) {
+                    res.status(400);
+                    return "Missing 'username' in data field (it is case-sensitive).";
+                }
+                // Find user by username
+                User sender = FindUser.getUserByUserName(username);
+                if (sender == null) {
+                    res.status(404);
+                    return "Unable to find user with username: " + username;
+                }
+                // Check if user has an Expo push token
+                String expoPushToken = sender.getExpoPushToken();
+                if (expoPushToken == null || expoPushToken.isEmpty()) {
+                    res.status(404);
+                    return "Unable to find an Expo push token for " + username;
+                }
+                // Build message for Expo API to send a push notification back to sender
+                Map<String, Object> message = new HashMap<>();
+                message.put("to", expoPushToken);
+                message.put("sound", "default");
+                message.put("title", "Thank you for sending your data!");
+                message.put("body", "A physician has received your data and will review it shortly.");
+                String expoApiUrl = "https://exp.host/--/api/v2/push/send";
+                java.net.URI uri = java.net.URI.create(expoApiUrl);
+                java.net.URL url = uri.toURL();
+                java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Accept", "application/json");
+                conn.setRequestProperty("Accept-encoding", "gzip, deflate");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+                String jsonMessage = gson.toJson(message);
+                try (java.io.OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonMessage.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+                int status = conn.getResponseCode();
+                java.io.InputStream is = (status < 400) ? conn.getInputStream() : conn.getErrorStream();
+                String responseBody;
+                try (java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A")) {
+                    responseBody = s.hasNext() ? s.next() : "";
+                }
+                res.status(status);
+                return responseBody;
+            } catch (Exception e) {
+                res.status(500);
+                return "Error: " + e.getMessage();
+            }
+        });
+
         post("/login", (req, res)->loginUser(req, res));
         post("/twofactorlogin/:phoneNumber",(req, res) -> twoFactorLogin(req, res));
 
