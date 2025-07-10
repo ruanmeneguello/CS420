@@ -8,24 +8,29 @@ export async function POST(request: NextRequest) {
         // Get the session token from headers
         const sessionToken = request.headers.get('suresteps.session.token');
 
+        if (!sessionToken) {
+            return NextResponse.json({ error: 'Missing session token' }, { status: 401 });
+        }
+
         // Forward the request to the old API at dev.stedi.me
         const response = await fetch('https://dev.stedi.me/customer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'suresteps.session.token': sessionToken || '',
+                'suresteps.session.token': sessionToken,
             },
             body: JSON.stringify(body),
         });
 
-        // Return status 200 if successful, otherwise return the error status
         if (response.ok) {
             return new NextResponse(null, { status: 200 });
         } else {
-            return new NextResponse(null, { status: response.status });
+            const errorText = await response.text();
+            console.error('Customer API error:', response.status, errorText);
+            return NextResponse.json({ error: errorText }, { status: response.status });
         }
-    } catch (_error) {
-        // Handle any network or parsing errors
+    } catch (error) {
+        console.error('Request failed:', error);
         return NextResponse.json({ error: 'Server Error' }, { status: 500 });
     }
 }
