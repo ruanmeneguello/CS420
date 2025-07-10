@@ -5,8 +5,20 @@ export async function POST(request: NextRequest) {
         // Get the request body
         const body = await request.json();
 
-        // Get the session token from headers
-        const sessionToken = request.headers.get('suresteps.session.token');
+        // Debug: log all headers
+        console.log('Request headers:', Object.fromEntries(request.headers.entries()));
+
+        // Get the session token from headers (case-insensitive)
+        let sessionToken = request.headers.get('suresteps.session.token');
+        if (!sessionToken) {
+            // Try to find the token in a case-insensitive way
+            for (const [key, value] of request.headers.entries()) {
+                if (key.toLowerCase() === 'suresteps.session.token') {
+                    sessionToken = value;
+                    break;
+                }
+            }
+        }
 
         if (!sessionToken) {
             return NextResponse.json({ error: 'Missing session token' }, { status: 401 });
