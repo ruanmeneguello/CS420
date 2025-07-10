@@ -1,36 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-type RouteParams = {
-    email: string;
-};
-
-type PageProps = {
-    params: Promise<RouteParams>;
-};
-
-export async function GET(request: NextRequest, { params }: PageProps) {
+export async function POST(request: NextRequest) {
     try {
-        const { email } = await params;
-        
-        // Get the session token from headers
-        const sessionToken = request.headers.get('suresteps.session.token');
-        
+        // Get the request body
+        const body = await request.json();
+
         // Forward the request to the old API at dev.stedi.me
-        const response = await fetch(`https://dev.stedi.me/riskscore/${email}`, {
-            method: 'GET',
-            headers: { 
-                'suresteps.session.token': sessionToken || '',
+        const response = await fetch('https://dev.stedi.me/user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
             },
+            body: JSON.stringify(body),
         });
-        
-        // Return the risk score JSON if successful
+
+        // Return status 200 if successful, otherwise return the error status
         if (response.ok) {
-            const result = await response.json();
-            return NextResponse.json(result);
+            return new NextResponse(null, { status: 200 });
         } else {
             return new NextResponse(null, { status: response.status });
         }
-    } catch (error) {
+    } catch (_error) {
         // Handle any network or parsing errors
         return NextResponse.json({ error: 'Server Error' }, { status: 500 });
     }
