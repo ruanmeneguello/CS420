@@ -21,7 +21,7 @@ export const POST = async (request: NextRequest) => {
         // Enqueue the step
 
         // Create JWT token
-        return new NextResponse(null, { status: 202 });
+        return NextResponse.json({ message: 'Step created successfully' }, { status: 202 });
     } catch (e) {
         if (e instanceof HttpException) {
             return NextResponse.json({ error: e.message }, { status: e.statusCode });

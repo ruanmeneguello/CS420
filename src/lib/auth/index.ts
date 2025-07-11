@@ -60,7 +60,17 @@ export async function getSession(): Promise<Session & { user: User }> {
     try {
         const headerList = await headers();
 
-        const authorization = headerList.get('authorization');
+        // Check for Authorization header first
+        let authorization = headerList.get('authorization');
+        
+        // If no Authorization header, check for suresteps.session.token header
+        if (!authorization) {
+            const surestepsToken = headerList.get('suresteps.session.token');
+            if (surestepsToken) {
+                authorization = `Bearer ${surestepsToken}`;
+            }
+        }
+
         if (!authorization) {
             throw new HttpException(401, 'Unauthenticated');
         }

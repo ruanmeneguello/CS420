@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-const port = 3001;
+const port = 3000;
 
 export default defineConfig({
     testDir: './__test__/e2e',
@@ -17,6 +17,6 @@ export default defineConfig({
     webServer: {
         port,
         command: `npm run dev -- --port ${port}`,
-        reuseExistingServer: false,
+        reuseExistingServer: true,
     },
 });

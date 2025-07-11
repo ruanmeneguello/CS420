@@ -11,6 +11,8 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '../../');
 dotenv.config({ path: path.resolve(rootDir, '.env') });
 
+console.log('API_URL from env:', process.env.API_URL);
+
 // Check if API_URL environment variable exists
 if (!process.env.API_URL) {
     console.error('\x1b[31m%s\x1b[0m', `
@@ -46,6 +48,11 @@ if (API_URL.includes('dev.stedi.me') || API_URL.includes('stedi.me')) {
    IMPORTANT: These tests are meant to run against YOUR OWN deployed API, not the example API.
 `);
     process.exit(1); // Exit with error code
+}
+
+// For local development, allow localhost URLs
+if (API_URL.includes('localhost') || API_URL.includes('127.0.0.1')) {
+    console.log('\x1b[33m%s\x1b[0m', `⚠️  Running tests against local API: ${API_URL}`);
 }
 
 let token = null;
