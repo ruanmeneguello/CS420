@@ -1,0 +1,14 @@
+meta {
+  name: customers
+  seq: 2
+}
+
+auth {
+  mode: apikey
+}
+
+auth:apikey {
+  key: suresteps.session.token
+  value: {{token}}
+  placement: header
+}

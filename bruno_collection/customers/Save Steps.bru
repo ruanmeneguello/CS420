@@ -1,0 +1,43 @@
+meta {
+  name: Save Steps
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/rapidsteptest
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {}
+}
+
+script:pre-request {
+  const { faker } = require('@faker-js/faker/locale/en');
+  
+  function createSteps(customer) {
+      const startTime = Date.now();
+      // between 10 and 30
+      const totalSteps = faker.number.int({ min: 10, max: 30 });
+      const stepPoints = Array.from({ length: totalSteps }, () => faker.number.int({ min: 150, max: 4000 }));
+      const testDuration = faker.number.int({ min: 5000, max: 20000 });
+      const stopTime = startTime + testDuration;
+      const deviceId = faker.string.numeric(3);
+  
+      return {
+          customer,
+          startTime,
+          stepPoints,
+          stopTime,
+          testTime: testDuration,
+          totalSteps,
+          // "deviceId": "007"
+          deviceId,
+      };
+  }
+  
+  // set the body
+  req.setBody(createSteps('nelson_ward@email.com'));
+}

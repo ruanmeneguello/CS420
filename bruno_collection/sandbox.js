@@ -1,33 +1,25 @@
-const { allLocales } = require('@faker-js/faker');
 const { faker } = require('@faker-js/faker/locale/en');
 
-function createUser(sex) {
-    const firstName = faker.person.firstName(sex);
-    const lastName = faker.person.lastName();
-
-    const email = faker.internet.email({ firstName, lastName, provider: 'email.com' }).toLowerCase();
+function createSteps(customer) {
+    const startTime = Date.now();
+    // between 10 and 30
+    const totalSteps = faker.number.int({ min: 10, max: 30 });
+    const stepPoints = Array.from({ length: totalSteps }, () => faker.number.int({ min: 150, max: 4000 }));
+    const testDuration = faker.number.int({ min: 5000, max: 20000 });
+    const stopTime = startTime + testDuration;
+    const deviceId = faker.string.numeric(3);
 
     return {
-        firstName,
-        lastName,
-        email: email,
-        phone: faker.phone.number({ style: 'international' }),
-        password: faker.internet.password({
-            length: 12,
-            prefix: '!1Aa',
-        }),
-        dateOfBirth: faker.date
-            .past({
-                years: 20,
-            })
-            .toISOString()
-            .substring(0, 10),
+        customer,
+        startTime,
+        stepPoints,
+        stopTime,
+        testTime: testDuration,
+        totalSteps,
+        // "deviceId": "007"
+        deviceId,
     };
 }
 
-const randomLocale = faker.helpers.arrayElement(Object.keys(allLocales));
-
-console.log('Random locale:', randomLocale);
-
 // fake timezone
-console.log(createUser(faker.person.sex()));
+console.log(createSteps(faker.internet.email().toLowerCase()));

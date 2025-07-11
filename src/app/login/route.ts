@@ -14,13 +14,13 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify(body),
         });
 
-        // Return the session token as text if successful
-        if (response.ok) {
-            const token = await response.text();
-            return new NextResponse(token, { status: 200 });
-        } else {
+        // early return
+        if (!response.ok) {
             return new NextResponse(null, { status: response.status });
         }
+
+        const token = await response.text();
+        return new NextResponse(token, { status: 200 });
     } catch (_error) {
         // Handle any network or parsing errors
         return NextResponse.json({ error: 'Server Error' }, { status: 500 });
