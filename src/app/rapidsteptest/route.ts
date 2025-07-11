@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getStediToken } from '@/lib/stedi';
+
 export async function POST(request: NextRequest) {
     try {
         // Get the request body
         const body = await request.json();
 
-        // Get the session token from headers
-        const sessionToken = request.headers.get('suresteps.session.token');
+        let sessionToken = await getStediToken();
 
         // Forward the request to the old API at dev.stedi.me
         const response = await fetch('https://dev.stedi.me/rapidsteptest', {

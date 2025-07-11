@@ -1,0 +1,60 @@
+meta {
+  name: Create User
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/user
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {}
+}
+
+script:pre-request {
+  const { faker } = require('@faker-js/faker/locale/en');
+  
+  function createUser(sex) {
+      const firstName = faker.person.firstName(sex);
+      const lastName = faker.person.lastName();
+  
+      const email = faker.internet.email({ firstName, lastName, provider: 'email.com' }).toLowerCase();
+  
+      return {
+          userName: email,
+          email: email,
+          phone: faker.phone.number({ style: 'international' }),
+          password: 'P@ssw0rd12',
+          verifyPassword: 'P@ssw0rd12',
+          birthDate: faker.date
+              .past({
+                  years: 20,
+              })
+              .toISOString()
+              .substring(0, 10),
+          agreedToTermsOfUseDate: Date.now(),
+          agreedToCookiePolicyDate: Date.now(),
+          agreedToPrivacyPolicyDate: Date.now(),
+          agreedToTextMessageDate: Date.now(),
+      };
+  }
+  
+  // fake user
+  const user = createUser(faker.person.sex());
+  
+  console.log(user);
+  
+  
+  // Get the body from the Body tab
+  const body = user;
+  
+  // Update the request body
+  req.setBody(body);
+  
+  
+  
+  
+}

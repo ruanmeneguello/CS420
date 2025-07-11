@@ -1,0 +1,22 @@
+meta {
+  name: Create Customer
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/customer
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "customerName": "Nelson Ward",
+    "email": "nelson_ward@email.com",
+    "phone": "+15762783623",
+    "whatsAppPhone": "+15762783623",
+    "region": "US",
+    "birthDay": "2001-01-01"
+  }
+}

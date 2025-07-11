@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
         // Return status 200 if successful, otherwise return the error status
         if (response.ok) {
-            return new NextResponse(null, { status: 200 });
+            return new NextResponse(null, { status: 201 });
         } else {
             return new NextResponse(null, { status: response.status });
         }
