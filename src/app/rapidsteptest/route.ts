@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'suresteps.session.token': sessionToken || '',
+                'suresteps-session-token': sessionToken || '',
             },
             body: JSON.stringify(body),
         });

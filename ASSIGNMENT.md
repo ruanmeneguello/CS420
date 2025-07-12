@@ -129,7 +129,7 @@ Your API needs to handle the following requests:
 ### 3. Create a Customer
 - **Endpoint**: `/customer`
 - **Method**: POST
-- **Headers**: `suresteps.session.token: <token from login>`
+- **Headers**: `suresteps-session-token: <token from login>`
 - **Body**:
   ```json
   {
@@ -146,7 +146,7 @@ Your API needs to handle the following requests:
 ### 4. Save Step Data
 - **Endpoint**: `/rapidsteptest`
 - **Method**: POST
-- **Headers**: `suresteps.session.token: <token from login>`
+- **Headers**: `suresteps-session-token: <token from login>`
 - **Body**:
   ```json
   {
@@ -162,7 +162,7 @@ Your API needs to handle the following requests:
 ### 5. Get Risk Score
 - **Endpoint**: `/riskscore/{email}`
 - **Method**: GET
-- **Headers**: `suresteps.session.token: <token from login>`
+- **Headers**: `suresteps-session-token: <token from login>`
 - **Response**:
   ```json
   {
