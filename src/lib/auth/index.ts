@@ -65,7 +65,10 @@ export async function getSession(): Promise<Session & { user: User }> {
         
         // If no Authorization header, check for suresteps.session.token header
         if (!authorization) {
-            const surestepsToken = headerList.get('suresteps.session.token');
+            let surestepsToken = headerList.get('suresteps.session.token');
+            if (!surestepsToken) {
+                surestepsToken = headerList.get('suresteps-session-token');
+            }
             if (surestepsToken) {
                 authorization = `Bearer ${surestepsToken}`;
             }
